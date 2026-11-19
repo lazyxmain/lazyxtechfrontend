@@ -1,7 +1,6 @@
 'use client';
 
 import { useRef, type ReactNode, type MouseEvent } from 'react';
-import { motion, useMotionValue, useSpring } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface MagneticProps {
@@ -12,6 +11,10 @@ interface MagneticProps {
   onClick?: () => void;
 }
 
+/**
+ * Subtle magnetic hover for buttons. Plain DOM transform (no animation
+ * library, no spring loop) and disabled on touch devices.
+ */
 export function Magnetic({
   children,
   className,
@@ -20,54 +23,43 @@ export function Magnetic({
   onClick,
 }: MagneticProps) {
   const ref = useRef<HTMLElement>(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const springX = useSpring(x, { stiffness: 200, damping: 18 });
-  const springY = useSpring(y, { stiffness: 200, damping: 18 });
 
-  const handleMouse = (e: MouseEvent) => {
+  const handleMove = (e: MouseEvent) => {
     const el = ref.current;
     if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const relX = e.clientX - rect.left - rect.width / 2;
-    const relY = e.clientY - rect.top - rect.height / 2;
-    x.set(relX * strength);
-    y.set(relY * strength);
+    const r = el.getBoundingClientRect();
+    const x = (e.clientX - r.left - r.width / 2) * strength;
+    const y = (e.clientY - r.top - r.height / 2) * strength;
+    el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
   };
-
   const reset = () => {
-    x.set(0);
-    y.set(0);
+    if (ref.current) ref.current.style.transform = '';
   };
 
-  const motionStyle = { x: springX, y: springY };
+  const shared = {
+    onMouseMove: handleMove,
+    onMouseLeave: reset,
+    className: cn(
+      'inline-block transition-transform duration-300 ease-out will-change-transform',
+      className
+    ),
+  };
 
   if (href) {
     return (
-      <motion.a
-        ref={ref as unknown as React.RefObject<HTMLAnchorElement>}
+      <a
+        ref={ref as React.RefObject<HTMLAnchorElement>}
         href={href}
         onClick={onClick}
-        onMouseMove={handleMouse}
-        onMouseLeave={reset}
-        style={motionStyle}
-        className={cn('inline-block', className)}
+        {...shared}
       >
         {children}
-      </motion.a>
+      </a>
     );
   }
-
   return (
-    <motion.div
-      ref={ref as React.RefObject<HTMLDivElement>}
-      onClick={onClick}
-      onMouseMove={handleMouse}
-      onMouseLeave={reset}
-      style={motionStyle}
-      className={cn('inline-block', className)}
-    >
+    <div ref={ref as React.RefObject<HTMLDivElement>} onClick={onClick} {...shared}>
       {children}
-    </motion.div>
+    </div>
   );
 }

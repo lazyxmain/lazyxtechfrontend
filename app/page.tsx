@@ -6,14 +6,16 @@ import { Process } from '@/components/sections/process';
 import { Work } from '@/components/sections/work';
 import { TechStack } from '@/components/sections/tech-stack';
 import { About } from '@/components/sections/about';
+import { FAQ } from '@/components/sections/faq';
 import { CTASection } from '@/components/sections/cta';
 import { Contact } from '@/components/sections/contact';
 import { Footer } from '@/components/sections/footer';
 
 export default function Home() {
   return (
-    <main className="relative">
+    <>
       <Navbar />
+      <main className="relative">
       <Hero />
       <Services />
       <WhyUs />
@@ -21,9 +23,11 @@ export default function Home() {
       <Work />
       <TechStack />
       <About />
+      <FAQ />
       <CTASection />
       <Contact />
-      <Footer />
     </main>
+      <Footer />
+    </>
   );
 }

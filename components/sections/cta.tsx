@@ -1,27 +1,18 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import { ArrowUpRight, Calendar } from 'lucide-react';
 import { Magnetic } from '@/components/magnetic';
-import { Reveal, SplitReveal } from '@/components/reveal';
+import { Reveal, SmokeText } from '@/components/reveal';
 
 export function CTASection() {
   return (
-    <section className="relative py-24 md:py-32">
+    <section id="start" aria-labelledby="cta-title" className="relative py-16 sm:py-24 md:py-32">
       <div className="mx-auto max-w-[1400px] px-5 md:px-8">
-        <div className="relative overflow-hidden rounded-3xl border border-border bg-foreground px-6 py-16 text-background md:px-16 md:py-24">
+        <div className="relative overflow-hidden rounded-3xl border border-border bg-foreground px-5 py-12 text-background sm:px-8 sm:py-16 md:px-16 md:py-24">
           {/* animated background elements */}
           <div className="pointer-events-none absolute inset-0">
-            <motion.div
-              className="absolute -left-20 -top-20 h-72 w-72 rounded-full bg-lime/20 blur-3xl"
-              animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.7, 0.4] }}
-              transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-            />
-            <motion.div
-              className="absolute -right-10 bottom-0 h-80 w-80 rounded-full bg-lime/10 blur-3xl"
-              animate={{ scale: [1.1, 1, 1.1], opacity: [0.3, 0.5, 0.3] }}
-              transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-            />
+            <div className="absolute -left-20 -top-20 h-60 w-60 rounded-full bg-lime/20 blur-3xl sm:h-72 sm:w-72" />
+            <div className="absolute -right-10 bottom-0 h-64 w-64 rounded-full bg-lime/10 blur-3xl sm:h-80 sm:w-80" />
             {/* grid lines */}
             <div
               className="absolute inset-0 opacity-[0.06]"
@@ -41,9 +32,11 @@ export function CTASection() {
                   Let&apos;s Build
                 </span>
               </Reveal>
-              <SplitReveal
-                text="Have an Idea? Let's Make It Real."
-                className="mt-6 font-display text-3xl font-semibold leading-[1.08] tracking-tightest sm:text-5xl lg:text-[3.4rem]"
+              <SmokeText
+                as="h2"
+                id="cta-title"
+                text="Have an Idea? Let\'s Make It Real."
+                className="text-balance mt-6 font-display text-[1.75rem] font-semibold leading-[1.1] tracking-tightest sm:text-5xl lg:text-[3.4rem]"
               />
               <Reveal delay={0.2}>
                 <p className="mt-6 max-w-xl text-base leading-relaxed text-background/60 sm:text-lg">
@@ -53,9 +46,9 @@ export function CTASection() {
               </Reveal>
             </div>
 
-            <Reveal delay={0.3} className="flex flex-shrink-0 flex-wrap gap-3">
-              <Magnetic href="#contact" strength={0.4}>
-                <span className="group flex items-center gap-2 rounded-xl bg-lime px-7 py-3.5 text-sm font-semibold text-lime-fg transition-transform">
+            <Reveal delay={0.3} className="flex w-full flex-shrink-0 flex-col gap-3 sm:w-auto sm:flex-row">
+              <Magnetic href="#contact" strength={0.4} className="w-full sm:w-auto">
+                <span className="group flex w-full items-center justify-center gap-2 rounded-xl bg-lime px-7 py-3.5 text-sm font-semibold text-lime-fg transition-transform">
                   Start Your Project
                   <ArrowUpRight
                     size={18}
@@ -63,8 +56,8 @@ export function CTASection() {
                   />
                 </span>
               </Magnetic>
-              <Magnetic href="#contact" strength={0.3}>
-                <span className="group flex items-center gap-2 rounded-xl border border-background/25 px-7 py-3.5 text-sm font-semibold text-background transition-colors hover:border-background/50">
+              <Magnetic href="#contact" strength={0.3} className="w-full sm:w-auto">
+                <span className="group flex w-full items-center justify-center gap-2 rounded-xl border border-background/25 px-7 py-3.5 text-sm font-semibold text-background transition-colors hover:border-background/50">
                   <Calendar size={18} />
                   Schedule a Call
                 </span>

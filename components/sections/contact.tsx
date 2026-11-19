@@ -1,12 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import { ArrowUpRight, Mail, Linkedin, MapPin, CheckCircle2, Loader2 } from 'lucide-react';
 import { SectionHeading } from '@/components/section-heading';
 import { Reveal } from '@/components/reveal';
 import { Magnetic } from '@/components/magnetic';
-import { getSupabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 
 const projectTypes = [
@@ -49,6 +47,8 @@ export function Contact() {
 
     let insertError: { message: string } | null = null;
     try {
+      // Loaded on demand so the Supabase SDK never blocks first paint.
+      const { getSupabase } = await import('@/lib/supabase');
       const sb = getSupabase();
       const { error } = await sb.from('project_inquiries').insert(payload);
       insertError = error;
@@ -65,16 +65,17 @@ export function Contact() {
   }
 
   return (
-    <section id="contact" className="relative py-24 md:py-32">
+    <section id="contact" aria-labelledby="contact-title" className="relative py-16 sm:py-24 md:py-32">
       <div className="mx-auto max-w-[1400px] px-5 md:px-8">
         <SectionHeading
           tag="Contact"
+          titleId="contact-title"
           title="Let's Start a Conversation."
           description="Tell us about your project. We'll get back to you within one business day."
           className="max-w-4xl"
         />
 
-        <div className="mt-14 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_1.4fr] lg:gap-12">
+        <div className="mt-10 grid grid-cols-1 gap-6 sm:mt-14 sm:gap-8 lg:grid-cols-[1fr_1.4fr] lg:gap-12">
           {/* Left — contact info */}
           <div className="flex flex-col gap-6">
             <Reveal>
@@ -87,7 +88,7 @@ export function Contact() {
                     <div className="text-xs uppercase tracking-[0.14em] text-foreground-muted">
                       Email
                     </div>
-                    <div className="font-medium">[Official Business Email]</div>
+                    <div className="break-all font-medium">[Official Business Email]</div>
                   </div>
                 </div>
               </div>
@@ -102,7 +103,7 @@ export function Contact() {
                     <div className="text-xs uppercase tracking-[0.14em] text-foreground-muted">
                       LinkedIn
                     </div>
-                    <div className="font-medium">[Official LinkedIn URL]</div>
+                    <div className="break-all font-medium">[Official LinkedIn URL]</div>
                   </div>
                 </div>
               </div>
@@ -142,7 +143,7 @@ export function Contact() {
           <Reveal delay={0.1}>
             <form
               onSubmit={handleSubmit}
-              className="rounded-2xl border border-border bg-surface p-6 md:p-8"
+              className="rounded-2xl border border-border bg-surface p-5 sm:p-6 md:p-8"
             >
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <Field label="Name" required>
@@ -209,21 +210,13 @@ export function Contact() {
               </div>
 
               {status === 'error' && (
-                <motion.p
-                  initial={{ opacity: 0, y: -6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mt-4 text-sm text-red-500"
-                >
+                <p role="alert" className="mt-4 text-sm text-red-500">
                   {errorMsg}
-                </motion.p>
+                </p>
               )}
 
               {status === 'success' ? (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="mt-6 flex items-center gap-3 rounded-xl border border-lime/40 bg-lime/10 px-5 py-4"
-                >
+                <div role="status" className="mt-6 flex items-center gap-3 rounded-xl border border-lime/40 bg-lime/10 px-5 py-4">
                   <CheckCircle2 size={20} className="text-foreground" />
                   <div>
                     <div className="font-semibold">Inquiry sent!</div>
@@ -231,10 +224,10 @@ export function Contact() {
                       We&apos;ll be in touch within one business day.
                     </div>
                   </div>
-                </motion.div>
+                </div>
               ) : (
                 <div className="mt-6">
-                  <Magnetic strength={0.25}>
+                  <Magnetic strength={0.25} className="w-full sm:w-auto">
                     <button
                       type="submit"
                       disabled={status === 'loading'}
@@ -270,7 +263,7 @@ export function Contact() {
           border: 1px solid hsl(var(--border));
           background-color: hsl(var(--bg));
           padding: 0.75rem 0.875rem;
-          font-size: 0.9rem;
+          font-size: 1rem;
           color: hsl(var(--foreground));
           transition: border-color 0.2s, box-shadow 0.2s;
         }
