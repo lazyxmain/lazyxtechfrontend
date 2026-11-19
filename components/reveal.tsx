@@ -1,95 +1,92 @@
 'use client';
 
-import { useRef, type ReactNode } from 'react';
-import { motion, useInView, type Variants } from 'framer-motion';
+import { createElement, type CSSProperties, type ReactNode } from 'react';
+import { useInViewOnce } from '@/components/use-in-view';
+import { cn } from '@/lib/utils';
 
 interface RevealProps {
   children: ReactNode;
   className?: string;
   delay?: number;
   y?: number;
-  once?: boolean;
 }
 
-export function Reveal({
-  children,
-  className,
-  delay = 0,
-  y = 24,
-  once = true,
-}: RevealProps) {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once, margin: '-80px' });
-
+/** Light fade-up reveal. Pure CSS transition, triggered once on scroll. */
+export function Reveal({ children, className, delay = 0, y = 24 }: RevealProps) {
+  const [ref, inView] = useInViewOnce<HTMLDivElement>();
   return (
-    <motion.div
+    <div
       ref={ref}
-      initial={{ opacity: 0, y }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{
-        duration: 0.7,
-        delay,
-        ease: [0.22, 1, 0.36, 1],
-      }}
-      className={className}
+      className={cn('rv', inView && 'rv-in', className)}
+      style={
+        {
+          '--rv-y': `${y}px`,
+          transitionDelay: delay ? `${delay}s` : undefined,
+        } as CSSProperties
+      }
     >
       {children}
-    </motion.div>
+    </div>
   );
 }
 
-interface SplitRevealProps {
+type SmokeTag = 'h1' | 'h2' | 'h3' | 'p' | 'span' | 'div';
+
+interface SmokeTextProps {
+  text: string;
+  as?: SmokeTag;
+  id?: string;
+  className?: string;
+  delay?: number;
+  /** ms between words */
+  stagger?: number;
+}
+
+/**
+ * "Smoke" text reveal: each word fades in out of a blur while drifting up,
+ * like smoke clearing. CSS-only animation, runs once when scrolled into view.
+ */
+export function SmokeText({
+  text,
+  as = 'p',
+  id,
+  className,
+  delay = 0,
+  stagger = 45,
+}: SmokeTextProps) {
+  const [ref, inView] = useInViewOnce<HTMLElement>();
+  const words = text.split(' ');
+
+  return createElement(
+    as,
+    {
+      ref,
+      id,
+      className: cn('smoke', inView && 'smoke-in', className),
+      style: { '--smoke-delay': `${delay}s`, '--smoke-step': `${stagger}ms` },
+    },
+    words.map((word, i) => (
+      <span key={i}>
+        <span className="smoke-word" style={{ '--i': i } as CSSProperties}>
+          {word}
+        </span>
+        {i < words.length - 1 ? ' ' : ''}
+      </span>
+    ))
+  );
+}
+
+/** Backwards-compatible headline reveal (now the smoke effect). */
+export function SplitReveal({
+  text,
+  className,
+  delay = 0,
+}: {
   text: string;
   className?: string;
   delay?: number;
   stagger?: number;
   once?: boolean;
-}
-
-/** Word-by-word mask reveal for headlines. */
-export function SplitReveal({
-  text,
-  className,
-  delay = 0,
-  stagger = 0.06,
-  once = true,
-}: SplitRevealProps) {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once, margin: '-60px' });
-  const words = text.split(' ');
-
-  const container: Variants = {
-    hidden: {},
-    visible: { transition: { staggerChildren: stagger, delayChildren: delay } },
-  };
-  const child: Variants = {
-    hidden: { y: '110%' },
-    visible: {
-      y: '0%',
-      transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
-    },
-  };
-
-  return (
-    <motion.h2
-      ref={ref}
-      variants={container}
-      initial="hidden"
-      animate={inView ? 'visible' : 'hidden'}
-      className={className}
-    >
-      {words.map((word, i) => (
-        <span
-          key={i}
-          className="reveal-mask inline-block align-bottom"
-          style={{ paddingBottom: '0.08em' }}
-        >
-          <motion.span variants={child} className="inline-block">
-            {word}
-            {i < words.length - 1 ? '\u00A0' : ''}
-          </motion.span>
-        </span>
-      ))}
-    </motion.h2>
-  );
+}) {
+  return <SmokeText as="h2" text={text} className={className} delay={delay} />;
 }

@@ -9,6 +9,7 @@ const navLinks = [
   { label: 'Services', href: '#services' },
   { label: 'Work', href: '#work' },
   { label: 'About', href: '#about' },
+  { label: 'FAQ', href: '#faq' },
   { label: 'Contact', href: '#contact' },
 ];
 
@@ -28,15 +29,15 @@ const socials = [
 
 export function Footer() {
   return (
-    <footer className="relative border-t border-border bg-surface">
-      <div className="mx-auto max-w-[1400px] px-5 py-16 md:px-8 md:py-20">
+    <footer className="relative overflow-hidden border-t border-border bg-surface">
+      <div className="mx-auto max-w-[1400px] px-5 py-12 sm:py-16 md:px-8 md:py-20">
         {/* top CTA strip */}
         <Reveal>
           <div className="flex flex-col items-start justify-between gap-6 border-b border-border pb-12 md:flex-row md:items-center">
             <div>
-              <h2 className="font-display text-2xl font-semibold tracking-tight md:text-3xl">
+              <p className="font-display text-2xl font-semibold tracking-tight md:text-3xl">
                 Ready to build something?
-              </h2>
+              </p>
               <p className="mt-2 text-foreground-muted">
                 Let&apos;s turn your idea into a powerful digital product.
               </p>
@@ -54,9 +55,9 @@ export function Footer() {
         </Reveal>
 
         {/* main grid */}
-        <div className="grid grid-cols-2 gap-8 py-12 md:grid-cols-4 lg:grid-cols-5">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-10 py-10 sm:py-12 md:grid-cols-4 lg:grid-cols-5">
           {/* brand */}
-          <div className="col-span-2 lg:col-span-2">
+          <div className="col-span-2 md:col-span-4 lg:col-span-2">
             <a href="#home" className="flex items-center gap-2.5">
               <span className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-foreground text-background">
                 <span className="font-display text-lg font-bold">L</span>
@@ -150,7 +151,7 @@ export function Footer() {
 
       {/* oversized wordmark */}
       <div className="overflow-hidden">
-        <div className="select-none px-5 text-center">
+        <div aria-hidden="true" className="select-none px-5 text-center">
           <span className="font-display text-[18vw] font-bold leading-[0.8] tracking-tighter text-foreground/[0.04] md:text-[14vw]">
             LazyXTech
           </span>

@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Sun, Moon, ArrowUpRight } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Magnetic } from '@/components/magnetic';
@@ -12,6 +11,7 @@ const navLinks = [
   { label: 'Services', href: '#services' },
   { label: 'Work', href: '#work' },
   { label: 'About', href: '#about' },
+  { label: 'FAQ', href: '#faq' },
   { label: 'Contact', href: '#contact' },
 ];
 
@@ -23,36 +23,43 @@ export function Navbar() {
 
   useEffect(() => {
     setMounted(true);
-    const onScroll = () => setScrolled(window.scrollY > 24);
-    onScroll();
+    let ticking = false;
+    const update = () => {
+      setScrolled(window.scrollY > 24);
+      ticking = false;
+    };
+    const onScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+    };
+    update();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   useEffect(() => {
     document.body.style.overflow = open ? 'hidden' : '';
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
+    window.addEventListener('keydown', onKey);
     return () => {
       document.body.style.overflow = '';
+      window.removeEventListener('keydown', onKey);
     };
   }, [open]);
 
   return (
     <>
-      <motion.header
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8, delay: 1.1, ease: [0.22, 1, 0.36, 1] }}
-        className="fixed inset-x-0 top-0 z-[200]"
-      >
+      <header className="fixed inset-x-0 top-0 z-[200] px-2 sm:px-3">
         <div
           className={cn(
-            'mx-auto flex max-w-[1400px] items-center justify-between px-5 transition-all duration-500 md:px-8',
+            'mx-auto flex max-w-[1400px] items-center justify-between px-3 transition-[margin,padding,background-color,border-color] duration-300 sm:px-5 md:px-8',
             scrolled
-              ? 'my-3 rounded-2xl border border-border/60 glass py-3'
-              : 'my-0 border border-transparent py-5'
+              ? 'my-2 rounded-2xl border border-border/60 glass py-2.5 sm:my-3 sm:py-3'
+              : 'my-0 border border-transparent py-4 sm:py-5'
           )}
         >
-          {/* Logo */}
           <a
             href="#home"
             className="group flex items-center gap-2.5"
@@ -67,8 +74,7 @@ export function Navbar() {
             </span>
           </a>
 
-          {/* Desktop nav */}
-          <nav className="hidden items-center gap-1 lg:flex">
+          <nav aria-label="Primary" className="hidden items-center gap-1 lg:flex">
             {navLinks.map((link) => (
               <a
                 key={link.href}
@@ -81,107 +87,105 @@ export function Navbar() {
             ))}
           </nav>
 
-          {/* Right actions */}
           <div className="flex items-center gap-2 md:gap-3">
             <button
               onClick={() => mounted && setTheme(theme === 'dark' ? 'light' : 'dark')}
               aria-label="Toggle theme"
               className="flex h-10 w-10 items-center justify-center rounded-xl border border-border text-foreground/80 transition-colors hover:border-foreground/40 hover:text-foreground"
             >
-              {mounted && theme === 'dark' ? (
-                <Sun className="h-4.5 w-4.5" size={18} />
-              ) : (
-                <Moon className="h-4.5 w-4.5" size={18} />
-              )}
+              {mounted && theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
             </button>
 
-            <Magnetic
-              href="#contact"
-              className="hidden md:inline-block"
-            >
+            <Magnetic href="#contact" className="hidden md:inline-block">
               <span className="group flex items-center gap-2 rounded-xl bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-colors hover:bg-lime hover:text-lime-fg">
                 Let&apos;s Talk
                 <ArrowUpRight
                   size={16}
-                  className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                  className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
                 />
               </span>
             </Magnetic>
 
-            {/* Mobile toggle */}
             <button
               onClick={() => setOpen(true)}
               aria-label="Open menu"
+              aria-expanded={open}
+              aria-controls="mobile-menu"
               className="flex h-10 w-10 items-center justify-center rounded-xl border border-border text-foreground lg:hidden"
             >
               <Menu size={18} />
             </button>
           </div>
         </div>
-      </motion.header>
+      </header>
 
-      {/* Mobile menu */}
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            className="fixed inset-0 z-[300] lg:hidden"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div
-              className="absolute inset-0 bg-foreground/40 backdrop-blur-sm"
-              onClick={() => setOpen(false)}
-            />
-            <motion.div
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 26, stiffness: 220 }}
-              className="absolute right-0 top-0 flex h-full w-[85%] max-w-sm flex-col bg-[hsl(var(--bg))] p-6"
-            >
-              <div className="flex items-center justify-between">
-                <span className="font-display text-lg font-semibold">
-                  LazyXTech
-                </span>
-                <button
-                  onClick={() => setOpen(false)}
-                  aria-label="Close menu"
-                  className="flex h-10 w-10 items-center justify-center rounded-xl border border-border"
-                >
-                  <X size={18} />
-                </button>
-              </div>
-
-              <nav className="mt-10 flex flex-col gap-1">
-                {navLinks.map((link, i) => (
-                  <motion.a
-                    key={link.href}
-                    href={link.href}
-                    onClick={() => setOpen(false)}
-                    initial={{ opacity: 0, x: 30 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.1 + i * 0.07 }}
-                    className="flex items-center justify-between border-b border-border py-4 font-display text-2xl font-medium tracking-tight"
-                  >
-                    {link.label}
-                    <ArrowUpRight size={20} className="text-foreground-muted" />
-                  </motion.a>
-                ))}
-              </nav>
-
-              <a
-                href="#contact"
-                onClick={() => setOpen(false)}
-                className="mt-auto flex items-center justify-center gap-2 rounded-xl bg-lime py-4 text-base font-semibold text-lime-fg"
-              >
-                Start a Project
-                <ArrowUpRight size={18} />
-              </a>
-            </motion.div>
-          </motion.div>
+      {/* Mobile menu: always mounted, toggled with CSS (no animation library) */}
+      <div
+        id="mobile-menu"
+        aria-hidden={!open}
+        className={cn(
+          'fixed inset-0 z-[300] lg:hidden',
+          open ? 'visible' : 'invisible delay-300'
         )}
-      </AnimatePresence>
+      >
+        <div
+          onClick={() => setOpen(false)}
+          className={cn(
+            'absolute inset-0 bg-foreground/40 backdrop-blur-sm transition-opacity duration-300',
+            open ? 'opacity-100' : 'opacity-0'
+          )}
+        />
+        <div
+          className={cn(
+            'absolute right-0 top-0 flex h-full w-[85%] max-w-sm flex-col overflow-y-auto bg-bg p-6 shadow-2xl transition-transform duration-300 ease-out',
+            open ? 'translate-x-0' : 'translate-x-full'
+          )}
+        >
+          <div className="flex items-center justify-between">
+            <span className="font-display text-lg font-semibold">LazyXTech</span>
+            <button
+              onClick={() => setOpen(false)}
+              aria-label="Close menu"
+              className="flex h-10 w-10 items-center justify-center rounded-xl border border-border"
+            >
+              <X size={18} />
+            </button>
+          </div>
+
+          <nav aria-label="Mobile" className="mt-8 flex flex-col">
+            {navLinks.map((link, i) => (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={() => setOpen(false)}
+                tabIndex={open ? 0 : -1}
+                style={
+                  open
+                    ? {
+                        animation: 'mobile-menu-item 0.4s ease-out both',
+                        animationDelay: `${0.08 + i * 0.05}s`,
+                      }
+                    : undefined
+                }
+                className="flex items-center justify-between border-b border-border py-4 font-display text-2xl font-medium tracking-tight"
+              >
+                {link.label}
+                <ArrowUpRight size={20} className="text-foreground-muted" />
+              </a>
+            ))}
+          </nav>
+
+          <a
+            href="#contact"
+            onClick={() => setOpen(false)}
+            tabIndex={open ? 0 : -1}
+            className="mt-8 flex items-center justify-center gap-2 rounded-xl bg-lime py-4 text-base font-semibold text-lime-fg"
+          >
+            Start a Project
+            <ArrowUpRight size={18} />
+          </a>
+        </div>
+      </div>
     </>
   );
 }
