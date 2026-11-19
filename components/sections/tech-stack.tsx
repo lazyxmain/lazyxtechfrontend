@@ -15,7 +15,6 @@ const techs = [
   { name: 'MySQL', group: 'Database' },
   { name: 'Redis', group: 'Database' },
   { name: 'Shopify', group: 'Platform' },
-  { name: 'Three.js', group: 'Frontend' },
 ];
 
 export function TechStack() {

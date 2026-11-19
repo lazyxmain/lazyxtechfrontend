@@ -93,7 +93,7 @@ export function Hero() {
         {/* Visual */}
         <div
           style={d(0.3)}
-          className="hero-in relative h-[320px] w-full sm:h-[440px] lg:h-[560px]"
+          className="hero-in relative h-[340px] w-full sm:h-[440px] lg:h-[540px]"
         >
           <HeroVisual />
         </div>
