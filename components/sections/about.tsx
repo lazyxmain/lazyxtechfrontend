@@ -13,27 +13,37 @@ export function About() {
       <div className="mx-auto max-w-[1400px] px-5 md:px-8">
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-20">
           {/* Visual */}
-          <div className="relative order-2 lg:order-1" aria-hidden="true">
+          <div className="relative order-2 lg:order-1">
             <Reveal y={30}>
-              <div className="relative mx-auto aspect-square w-full max-w-[22rem] sm:max-w-md">
-                <div className="absolute inset-0 rounded-3xl border border-border bg-surface" />
-                <div className="absolute inset-[8%] rounded-2xl border border-border bg-bg" />
-                <div className="absolute inset-[18%] rounded-full bg-lime/20" />
-                <div className="animate-spin-slow absolute inset-[27%] rounded-full border-2 border-dashed border-foreground/15" />
-                <div className="absolute inset-0 flex items-center justify-center font-display text-[6rem] font-bold leading-none text-foreground/10 sm:text-[8rem]">
-                  L
+              <figure className="relative mx-auto w-full max-w-[22rem] sm:max-w-md">
+                <div className="overflow-hidden rounded-3xl border border-border bg-surface shadow-[0_30px_80px_-35px_rgba(0,0,0,0.35)]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/images/about-poster.svg"
+                    alt="LazyXTech poster: technology that solves real business problems"
+                    width={800}
+                    height={1000}
+                    loading="lazy"
+                    decoding="async"
+                    className="block h-auto w-full"
+                  />
                 </div>
-                <div className="animate-float absolute left-2 top-[12%] rounded-xl border border-border bg-surface px-3 py-2.5 shadow-sm sm:-left-4 sm:px-4 sm:py-3">
+                <div
+                  aria-hidden="true"
+                  className="animate-float absolute left-2 top-[10%] rounded-xl border border-border bg-surface px-3 py-2.5 shadow-md sm:-left-5 sm:px-4 sm:py-3"
+                >
                   <div className="text-xs text-foreground-muted">Approach</div>
                   <div className="font-display text-sm font-semibold">Design + Engineering</div>
                 </div>
                 <div
-                  className="animate-float-slow absolute bottom-[14%] right-2 rounded-xl border border-border bg-surface px-3 py-2.5 shadow-sm sm:-right-4 sm:px-4 sm:py-3"
+                  aria-hidden="true"
+                  className="animate-float-slow absolute bottom-[12%] right-2 rounded-xl border border-border bg-surface px-3 py-2.5 shadow-md sm:-right-5 sm:px-4 sm:py-3"
                 >
                   <div className="text-xs text-foreground-muted">Reach</div>
                   <div className="font-display text-sm font-semibold">Global Clients</div>
                 </div>
-              </div>
+                <figcaption className="sr-only">LazyXTech brand poster</figcaption>
+              </figure>
             </Reveal>
           </div>
 
