@@ -1,8 +1,14 @@
-import { ArrowUpRight, MapPin, ShieldCheck, Smartphone } from 'lucide-react';
+import { ArrowUpRight, MapPin } from 'lucide-react';
 import { Magnetic } from '@/components/magnetic';
 import { HeroVisual } from '@/components/hero-visual';
 
 const d = (s: number) => ({ '--d': `${s}s` } as React.CSSProperties);
+
+const stats = [
+  { value: '5+', label: 'Years of experience' },
+  { value: 'Global', label: 'Clients served' },
+  { value: '6 mo', label: 'Support after launch' },
+];
 
 export function Hero() {
   return (
@@ -20,44 +26,46 @@ export function Hero() {
         <div className="relative z-10 min-w-0">
           <div
             style={d(0.05)}
-            className="hero-in inline-flex items-center gap-2.5 rounded-full border border-border bg-surface/60 px-3.5 py-2 text-[11px] font-medium sm:px-4 sm:text-xs"
+            className="hero-in inline-flex max-w-full items-center gap-2.5 rounded-full border border-border bg-surface/60 px-3.5 py-2 text-[11px] font-medium sm:px-4 sm:text-xs"
           >
-            <span className="relative flex h-2 w-2">
+            <span className="relative flex h-2 w-2 shrink-0">
               <span
                 className="absolute inline-flex h-full w-full animate-ping rounded-full bg-lime opacity-75"
                 style={{ animationDuration: '2s' }}
               />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-lime" />
             </span>
-            Web & App Development Company · Bhopal, India
+            <span className="min-w-0">
+              5+ Years of Experience · Web &amp; App Development · Bhopal, India
+            </span>
           </div>
 
           <h1
             id="hero-title"
-            className="mt-5 text-balance font-display text-[2.15rem] font-semibold leading-[1.06] tracking-ultra min-[400px]:text-[2.5rem] sm:mt-6 sm:text-6xl lg:text-[4.2rem]"
+            className="mt-5 text-balance font-display text-[2rem] font-semibold leading-[1.08] tracking-ultra min-[400px]:text-[2.35rem] sm:mt-6 sm:text-6xl lg:text-[4rem]"
           >
-            <span className="hero-in block" style={d(0.1)}>Custom Websites</span>
-            <span className="hero-in block" style={d(0.18)}>&amp; Mobile Apps</span>
-            <span className="hero-in block" style={d(0.26)}>
-              That Grow Your{' '}
-            </span>
-            <span className="hero-in block" style={d(0.34)}>
+            <span className="hero-in block" style={d(0.1)}>
+              Websites, Stores &amp; Apps That Grow Your Business{' '}
               <span className="relative inline-block">
-                <span className="relative z-10">Business.</span>
+                <span className="relative z-10">Globally.</span>
                 <span className="hero-underline absolute bottom-1 left-0 h-2.5 w-full bg-lime sm:h-3" />
               </span>
             </span>
           </h1>
 
           <p
-            style={d(0.45)}
+            style={d(0.25)}
             className="hero-in mt-6 max-w-xl text-base leading-relaxed text-foreground-muted sm:mt-7 sm:text-lg"
           >
-            LazyXTech is a web and app development company in Bhopal, Madhya Pradesh. We build fast Next.js and React websites, WordPress sites, Shopify stores and React Native (Expo) mobile apps, with 6 months of support after launch.
+            With more than 5 years in the development industry, LazyXTech
+            delivers everything a business needs to get online, sell and scale:
+            e-commerce stores, custom websites, WordPress, Shopify and mobile
+            apps. We have helped clients grow their business globally, and every
+            project is backed by 6 months of support after launch.
           </p>
 
           <div
-            style={d(0.55)}
+            style={d(0.35)}
             className="hero-in mt-8 flex flex-col gap-3 min-[420px]:flex-row min-[420px]:flex-wrap min-[420px]:items-center sm:mt-9"
           >
             <Magnetic href="#contact" strength={0.4} className="w-full min-[420px]:w-auto">
@@ -65,6 +73,7 @@ export function Hero() {
                 Get a Free Quote
                 <ArrowUpRight
                   size={18}
+                  aria-hidden="true"
                   className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
                 />
               </span>
@@ -74,29 +83,40 @@ export function Hero() {
                 View Our Services
                 <ArrowUpRight
                   size={18}
+                  aria-hidden="true"
                   className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
                 />
               </span>
             </Magnetic>
           </div>
 
-          <ul
-            style={d(0.65)}
-            className="hero-in mt-10 flex flex-col gap-3 text-xs text-foreground-muted min-[480px]:flex-row min-[480px]:flex-wrap min-[480px]:gap-x-6 sm:mt-12 sm:text-sm"
+          {/* Experience / trust stats */}
+          <dl
+            style={d(0.45)}
+            className="hero-in mt-9 grid max-w-xl grid-cols-3 gap-3 sm:mt-11 sm:gap-4"
           >
-            <li className="flex items-center gap-2">
-              <MapPin size={15} className="shrink-0 text-foreground" aria-hidden="true" />
-              Based in Bhopal, India
-            </li>
-            <li className="flex items-center gap-2">
-              <ShieldCheck size={15} className="shrink-0 text-foreground" aria-hidden="true" />
-              6 months support after launch
-            </li>
-            <li className="flex items-center gap-2">
-              <Smartphone size={15} className="shrink-0 text-foreground" aria-hidden="true" />
-              Next.js · React · WordPress · Shopify · Expo
-            </li>
-          </ul>
+            {stats.map((s) => (
+              <div
+                key={s.label}
+                className="rounded-2xl border border-border bg-surface/60 px-3 py-3.5 sm:px-5 sm:py-4"
+              >
+                <dd className="font-display text-xl font-semibold leading-none tracking-tight sm:text-3xl">
+                  {s.value}
+                </dd>
+                <dt className="mt-1.5 text-[10px] leading-tight text-foreground-muted sm:text-xs">
+                  {s.label}
+                </dt>
+              </div>
+            ))}
+          </dl>
+
+          <p
+            style={d(0.55)}
+            className="hero-in mt-5 flex items-center gap-2 text-xs text-foreground-muted sm:text-sm"
+          >
+            <MapPin size={15} className="shrink-0 text-foreground" aria-hidden="true" />
+            Based in Bhopal, India · Serving clients worldwide
+          </p>
         </div>
 
         {/* Visual */}
