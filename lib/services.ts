@@ -1,4 +1,4 @@
-export type ServiceIcon = 'globe' | 'wordpress' | 'shopping' | 'mobile';
+export type ServiceIcon = 'globe' | 'wordpress' | 'shopping' | 'mobile' | 'search';
 
 export interface ServiceFaq {
   q: string;
@@ -218,8 +218,73 @@ export const SERVICES: Service[] = [
     ],
   },
   {
-    slug: 'app-development',
+    slug: 'seo-services',
     n: '04',
+    icon: 'search',
+    title: 'SEO Optimization & Web Ranking',
+    short:
+      'SEO audits, technical and on-page optimisation and ranking-focused improvements that help customers find you on Google.',
+    metaTitle: 'SEO Services in Bhopal: SEO Audit, Optimization & Web Ranking',
+    metaDescription:
+      'SEO company in Bhopal. SEO audits, technical and on-page optimization, local SEO and website ranking improvements to help your business get found on Google.',
+    keywords: [
+      'SEO services in Bhopal',
+      'SEO company in Bhopal',
+      'SEO audit Bhopal',
+      'local SEO Bhopal',
+      'website ranking services India',
+      'technical SEO optimization',
+    ],
+    h1: 'SEO Optimization & Web Ranking in Bhopal',
+    intro:
+      'A good website is only useful if people can find it. We audit your site, fix what is holding it back and optimise it step by step, so search engines understand your pages and the right customers reach you.',
+    points: [
+      'Complete SEO audit with a clear action plan',
+      'Technical and on-page SEO optimisation',
+      'Local SEO and Google Business Profile setup',
+      'Speed and Core Web Vitals improvements',
+    ],
+    features: [
+      {
+        title: 'SEO audit',
+        desc: 'We review your site for technical errors, speed, mobile usability, indexing, content and keywords, then give you a prioritised list of fixes.',
+      },
+      {
+        title: 'Technical and on-page SEO',
+        desc: 'Titles, meta descriptions, headings, internal links, sitemap, structured data and clean site structure, so search engines can read and rank your pages.',
+      },
+      {
+        title: 'Local SEO',
+        desc: 'Google Business Profile, local keywords and consistent business details, to help you show up when people nearby search for your service.',
+      },
+      {
+        title: 'Speed and ranking improvements',
+        desc: 'Faster loading pages, better Core Web Vitals and content improvements based on what your customers actually search for.',
+      },
+    ],
+    tech: ['Google Search Console', 'Google Analytics', 'PageSpeed Insights', 'Schema markup', 'Keyword research'],
+    faqs: [
+      {
+        q: 'Can you guarantee a number one ranking on Google?',
+        a: 'No one can honestly guarantee a specific ranking, because search engines decide it. What we do is fix technical problems, improve content and structure and build a strong foundation, which gives your site the best chance to rank.',
+      },
+      {
+        q: 'What is included in an SEO audit?',
+        a: 'We check technical health, speed, mobile usability, indexing, on-page elements, keywords and content gaps, and then share a clear, prioritised action plan.',
+      },
+      {
+        q: 'How long does SEO take to show results?',
+        a: 'SEO is gradual. Technical fixes can show improvements in a few weeks, while ranking growth for competitive keywords usually takes a few months of consistent work.',
+      },
+      {
+        q: 'Can you do SEO for a site you did not build?',
+        a: 'Yes. We can audit and optimise existing websites on WordPress, Shopify, Wix, Next.js and other platforms.',
+      },
+    ],
+  },
+  {
+    slug: 'app-development',
+    n: '05',
     icon: 'mobile',
     title: 'Mobile App Development (React Native & Expo)',
     short:

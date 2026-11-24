@@ -1,4 +1,4 @@
-import { Globe, LayoutTemplate, ShoppingBag, Smartphone } from 'lucide-react';
+import { Globe, LayoutTemplate, Search, ShoppingBag, Smartphone } from 'lucide-react';
 import type { ServiceIcon } from '@/lib/services';
 
 const map = {
@@ -6,6 +6,7 @@ const map = {
   wordpress: LayoutTemplate,
   shopping: ShoppingBag,
   mobile: Smartphone,
+  search: Search,
 } as const;
 
 export function ServiceIconView({
