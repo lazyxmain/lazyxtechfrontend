@@ -3,12 +3,14 @@ import type { Metadata } from 'next';
 import { Inter, Space_Grotesk } from 'next/font/google';
 import { ThemeProvider } from '@/components/theme-provider';
 import {
-  FAQS,
+  COMPANY,
+  LOCATION_LABEL,
   SITE_DESCRIPTION,
   SITE_NAME,
   SITE_TITLE,
   SITE_URL,
 } from '@/lib/site';
+import { SERVICES } from '@/lib/services';
 
 const sans = Inter({
   subsets: ['latin'],
@@ -37,16 +39,16 @@ export const metadata: Metadata = {
     { media: '(prefers-color-scheme: dark)', color: '#0A0A0A' },
   ],
   keywords: [
-    'software development agency',
-    'web development company',
-    'Next.js development',
-    'custom web application development',
-    'e-commerce development',
-    'Shopify development',
-    'SaaS development',
-    'Node.js API development',
-    'React development agency',
-    'website development India',
+    'web development company in Bhopal',
+    'website development Bhopal',
+    'WordPress developer in Bhopal',
+    'Shopify developer in Bhopal',
+    'app development company in Bhopal',
+    'React Native developer Bhopal',
+    'Next.js developer Bhopal',
+    'custom website development Madhya Pradesh',
+    'mobile app development India',
+    'LazyXTech',
   ],
   authors: [{ name: SITE_NAME, url: SITE_URL }],
   creator: SITE_NAME,
@@ -70,13 +72,13 @@ export const metadata: Metadata = {
     url: '/',
     type: 'website',
     siteName: SITE_NAME,
-    locale: 'en_US',
+    locale: 'en_IN',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'LazyXTech - Digital Product & Software Development Agency',
+        alt: 'LazyXTech - Web, WordPress, Shopify and App Development Company in Bhopal',
       },
     ],
   },
@@ -89,6 +91,13 @@ export const metadata: Metadata = {
   formatDetection: { telephone: false, email: false, address: false },
 };
 
+const address = {
+  '@type': 'PostalAddress',
+  addressLocality: COMPANY.city,
+  addressRegion: COMPANY.region,
+  addressCountry: COMPANY.countryCode,
+};
+
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -98,15 +107,18 @@ const jsonLd = {
       name: SITE_NAME,
       url: SITE_URL,
       logo: `${SITE_URL}/icon.svg`,
-      description: SITE_DESCRIPTION,
-      areaServed: [
-        'United States',
-        'United Kingdom',
-        'Canada',
-        'Australia',
-        'Europe',
-        'India',
-      ],
+      email: COMPANY.email,
+      telephone: COMPANY.phone,
+      address,
+      sameAs: [COMPANY.linkedin],
+      contactPoint: {
+        '@type': 'ContactPoint',
+        telephone: COMPANY.phone,
+        email: COMPANY.email,
+        contactType: 'customer support',
+        areaServed: ['IN', 'US', 'GB', 'CA', 'AU', 'AE'],
+        availableLanguage: ['English', 'Hindi'],
+      },
     },
     {
       '@type': 'WebSite',
@@ -114,39 +126,50 @@ const jsonLd = {
       url: SITE_URL,
       name: SITE_NAME,
       description: SITE_DESCRIPTION,
-      inLanguage: 'en',
+      inLanguage: 'en-IN',
       publisher: { '@id': `${SITE_URL}/#organization` },
     },
     {
       '@type': 'ProfessionalService',
-      '@id': `${SITE_URL}/#service`,
+      '@id': `${SITE_URL}/#localbusiness`,
       name: SITE_NAME,
+      description: SITE_DESCRIPTION,
       url: SITE_URL,
       image: `${SITE_URL}/og-image.png`,
-      description: SITE_DESCRIPTION,
-      address: { '@type': 'PostalAddress', addressCountry: 'IN' },
-      parent: { '@id': `${SITE_URL}/#organization` },
+      email: COMPANY.email,
+      telephone: COMPANY.phone,
+      address,
+      geo: {
+        '@type': 'GeoCoordinates',
+        latitude: COMPANY.geo.lat,
+        longitude: COMPANY.geo.lng,
+      },
+      areaServed: [
+        { '@type': 'City', name: COMPANY.city },
+        { '@type': 'State', name: COMPANY.region },
+        { '@type': 'Country', name: COMPANY.country },
+      ],
+      knowsAbout: [
+        'Website development',
+        'WordPress development',
+        'Shopify development',
+        'React Native app development',
+        'Next.js',
+      ],
+      sameAs: [COMPANY.linkedin],
+      parentOrganization: { '@id': `${SITE_URL}/#organization` },
       hasOfferCatalog: {
         '@type': 'OfferCatalog',
-        name: 'Digital product development services',
-        itemListElement: [
-          'Website Development',
-          'Custom Web Application Development',
-          'E-commerce Development',
-          'Backend & API Development',
-        ].map((name) => ({
+        name: `Web and app development services in ${LOCATION_LABEL}`,
+        itemListElement: SERVICES.map((s) => ({
           '@type': 'Offer',
-          itemOffered: { '@type': 'Service', name },
+          itemOffered: {
+            '@type': 'Service',
+            name: s.title,
+            url: `${SITE_URL}/services/${s.slug}`,
+          },
         })),
       },
-    },
-    {
-      '@type': 'FAQPage',
-      mainEntity: FAQS.map((f) => ({
-        '@type': 'Question',
-        name: f.q,
-        acceptedAnswer: { '@type': 'Answer', text: f.a },
-      })),
     },
   ],
 };
@@ -158,7 +181,7 @@ export default function RootLayout({
 }) {
   return (
     <html
-      lang="en"
+      lang="en-IN"
       suppressHydrationWarning
       className={`${sans.variable} ${display.variable}`}
     >

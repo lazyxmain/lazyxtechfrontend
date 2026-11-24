@@ -1,6 +1,7 @@
 'use client';
 
-import { ArrowUpRight, Calendar } from 'lucide-react';
+import { ArrowUpRight, Phone } from 'lucide-react';
+import { COMPANY } from '@/lib/site';
 import { Magnetic } from '@/components/magnetic';
 import { Reveal, SmokeText } from '@/components/reveal';
 
@@ -29,19 +30,18 @@ export function CTASection() {
               <Reveal>
                 <span className="inline-flex items-center gap-2 rounded-full border border-background/20 px-4 py-1.5 text-xs font-medium uppercase tracking-[0.14em] text-background/70">
                   <span className="h-1.5 w-1.5 rounded-full bg-lime" />
-                  Let&apos;s Build
+                  Free Consultation
                 </span>
               </Reveal>
               <SmokeText
                 as="h2"
                 id="cta-title"
-                text="Have an Idea? Let\'s Make It Real."
+                text="Have a Project in Mind? Let's Talk."
                 className="text-balance mt-6 font-display text-[1.75rem] font-semibold leading-[1.1] tracking-tightest sm:text-5xl lg:text-[3.4rem]"
               />
               <Reveal delay={0.2}>
                 <p className="mt-6 max-w-xl text-base leading-relaxed text-background/60 sm:text-lg">
-                  Tell us what you&apos;re building. Let&apos;s explore how we can
-                  turn your vision into a powerful digital product.
+                  Tell us what you need, whether it is a website, a Shopify store or a mobile app. We will reply within one business day with questions or a clear proposal.
                 </p>
               </Reveal>
             </div>
@@ -49,17 +49,17 @@ export function CTASection() {
             <Reveal delay={0.3} className="flex w-full flex-shrink-0 flex-col gap-3 sm:w-auto sm:flex-row">
               <Magnetic href="#contact" strength={0.4} className="w-full sm:w-auto">
                 <span className="group flex w-full items-center justify-center gap-2 rounded-xl bg-lime px-7 py-3.5 text-sm font-semibold text-lime-fg transition-transform">
-                  Start Your Project
+                  Get a Free Quote
                   <ArrowUpRight
                     size={18}
                     className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                   />
                 </span>
               </Magnetic>
-              <Magnetic href="#contact" strength={0.3} className="w-full sm:w-auto">
+              <Magnetic href={`tel:${COMPANY.phone}`} strength={0.3} className="w-full sm:w-auto">
                 <span className="group flex w-full items-center justify-center gap-2 rounded-xl border border-background/25 px-7 py-3.5 text-sm font-semibold text-background transition-colors hover:border-background/50">
-                  <Calendar size={18} />
-                  Schedule a Call
+                  <Phone size={18} aria-hidden="true" />
+                  Call {COMPANY.phoneDisplay}
                 </span>
               </Magnetic>
             </Reveal>

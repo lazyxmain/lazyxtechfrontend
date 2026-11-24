@@ -7,12 +7,12 @@ import { Magnetic } from '@/components/magnetic';
 import { cn } from '@/lib/utils';
 
 const navLinks = [
-  { label: 'Home', href: '#home' },
-  { label: 'Services', href: '#services' },
-  { label: 'Work', href: '#work' },
-  { label: 'About', href: '#about' },
-  { label: 'FAQ', href: '#faq' },
-  { label: 'Contact', href: '#contact' },
+  { label: 'Home', href: '/#home' },
+  { label: 'Services', href: '/#services' },
+  { label: 'Support', href: '/#support' },
+  { label: 'About', href: '/#about' },
+  { label: 'FAQ', href: '/#faq' },
+  { label: 'Contact', href: '/#contact' },
 ];
 
 export function Navbar() {
@@ -61,7 +61,7 @@ export function Navbar() {
           )}
         >
           <a
-            href="#home"
+            href="/#home"
             className="group flex items-center gap-2.5"
             aria-label="LazyXTech home"
           >
@@ -96,7 +96,7 @@ export function Navbar() {
               {mounted && theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
             </button>
 
-            <Magnetic href="#contact" className="hidden md:inline-block">
+            <Magnetic href="/#contact" className="hidden md:inline-block">
               <span className="group flex items-center gap-2 rounded-xl bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-colors hover:bg-lime hover:text-lime-fg">
                 Let&apos;s Talk
                 <ArrowUpRight
@@ -176,7 +176,7 @@ export function Navbar() {
           </nav>
 
           <a
-            href="#contact"
+            href="/#contact"
             onClick={() => setOpen(false)}
             tabIndex={open ? 0 : -1}
             className="mt-8 flex items-center justify-center gap-2 rounded-xl bg-lime py-4 text-base font-semibold text-lime-fg"

@@ -1,27 +1,57 @@
 'use client';
 
-import { useState } from 'react';
-import { ArrowUpRight, Mail, Linkedin, MapPin, CheckCircle2, Loader2 } from 'lucide-react';
+import { useRef, useState } from 'react';
+import {
+  ArrowUpRight,
+  Mail,
+  Linkedin,
+  MapPin,
+  Phone,
+  MessageCircle,
+  CheckCircle2,
+  Loader2,
+} from 'lucide-react';
 import { SectionHeading } from '@/components/section-heading';
 import { Reveal } from '@/components/reveal';
 import { Magnetic } from '@/components/magnetic';
 import { cn } from '@/lib/utils';
+import { COMPANY, LOCATION_LABEL, buildMailto } from '@/lib/site';
 
 const projectTypes = [
-  'Website Development',
-  'Web Application',
-  'E-commerce',
-  'Backend & API',
-  'Other',
+  'Custom Website (Next.js / React)',
+  'WordPress Website',
+  'Shopify Store',
+  'Mobile App (React Native / Expo)',
+  'Not sure yet',
 ];
 
-const budgets = ['< $5k', '$5k – $15k', '$15k – $40k', '$40k+'];
+const budgets = [
+  'Under ₹30,000',
+  '₹30,000 – ₹1,00,000',
+  '₹1,00,000 – ₹3,00,000',
+  '₹3,00,000+',
+  'Not decided yet',
+];
 
 export function Contact() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>(
     'idle'
   );
   const [errorMsg, setErrorMsg] = useState('');
+  const formRef = useRef<HTMLFormElement>(null);
+
+  function openFormattedEmail() {
+    const f = formRef.current;
+    const get = (n: string) =>
+      f ? String((new FormData(f).get(n) as string) || '').trim() : '';
+    window.location.href = buildMailto({
+      service: get('project_type') || undefined,
+      name: get('name'),
+      company: get('company'),
+      budget: get('budget'),
+      details: get('description'),
+    });
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -57,7 +87,7 @@ export function Contact() {
     }
     if (insertError) {
       setStatus('error');
-      setErrorMsg('Something went wrong. Please try again or email us directly.');
+      setErrorMsg('Something went wrong. Please try again, or call or email us directly.');
       return;
     }
     setStatus('success');
@@ -71,68 +101,61 @@ export function Contact() {
           tag="Contact"
           titleId="contact-title"
           title="Let's Start a Conversation."
-          description="Tell us about your project. We'll get back to you within one business day."
+          description="Call, WhatsApp, email or fill in the form. We reply to every inquiry within one business day."
           className="max-w-4xl"
         />
 
         <div className="mt-10 grid grid-cols-1 gap-6 sm:mt-14 sm:gap-8 lg:grid-cols-[1fr_1.4fr] lg:gap-12">
-          {/* Left — contact info */}
-          <div className="flex flex-col gap-6">
-            <Reveal>
-              <div className="rounded-2xl border border-border bg-surface p-6">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-bg">
-                    <Mail size={18} />
-                  </div>
-                  <div>
-                    <div className="text-xs uppercase tracking-[0.14em] text-foreground-muted">
-                      Email
-                    </div>
-                    <div className="break-all font-medium">[Official Business Email]</div>
-                  </div>
-                </div>
-              </div>
-            </Reveal>
-            <Reveal delay={0.08}>
-              <div className="rounded-2xl border border-border bg-surface p-6">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-bg">
-                    <Linkedin size={18} />
-                  </div>
-                  <div>
-                    <div className="text-xs uppercase tracking-[0.14em] text-foreground-muted">
-                      LinkedIn
-                    </div>
-                    <div className="break-all font-medium">[Official LinkedIn URL]</div>
-                  </div>
-                </div>
-              </div>
-            </Reveal>
-            <Reveal delay={0.16}>
-              <div className="rounded-2xl border border-border bg-surface p-6">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-bg">
-                    <MapPin size={18} />
-                  </div>
-                  <div>
-                    <div className="text-xs uppercase tracking-[0.14em] text-foreground-muted">
-                      Location
-                    </div>
-                    <div className="font-medium">India | Working Worldwide</div>
-                  </div>
-                </div>
-              </div>
-            </Reveal>
+          {/* Left: contact info */}
+          <div className="flex min-w-0 flex-col gap-4 sm:gap-5">
+            <ContactCard
+              icon={<Phone size={18} aria-hidden="true" />}
+              label="Call"
+              value={COMPANY.phoneDisplay}
+              href={`tel:${COMPANY.phone}`}
+              title={`Call LazyXTech on ${COMPANY.phoneDisplay}`}
+            />
+            <ContactCard
+              icon={<MessageCircle size={18} aria-hidden="true" />}
+              label="WhatsApp"
+              value="Chat on WhatsApp"
+              href={COMPANY.whatsapp}
+              external
+              title="Message LazyXTech on WhatsApp"
+            />
+            <ContactCard
+              icon={<Mail size={18} aria-hidden="true" />}
+              label="Email"
+              value={COMPANY.email}
+              href={buildMailto()}
+              title="Email LazyXTech with a ready-made project inquiry"
+              delay={0.08}
+            />
+            <ContactCard
+              icon={<Linkedin size={18} aria-hidden="true" />}
+              label="LinkedIn"
+              value="LazyXTech on LinkedIn"
+              href={COMPANY.linkedin}
+              external
+              title="LazyXTech LinkedIn profile"
+              delay={0.12}
+            />
+            <ContactCard
+              icon={<MapPin size={18} aria-hidden="true" />}
+              label="Location"
+              value={LOCATION_LABEL}
+              delay={0.16}
+            />
 
-            <Reveal delay={0.24}>
-              <div className="mt-auto rounded-2xl border border-border bg-bg p-6">
+            <Reveal delay={0.2}>
+              <div className="rounded-2xl border border-border bg-bg p-5">
                 <div className="flex items-center gap-2 text-sm">
                   <span className="relative flex h-2 w-2">
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-lime opacity-75" style={{ animationDuration: '2s' }} />
                     <span className="relative inline-flex h-2 w-2 rounded-full bg-lime" />
                   </span>
                   <span className="text-foreground-muted">
-                    Currently accepting new projects
+                    Accepting new projects · 6 months support included
                   </span>
                 </div>
               </div>
@@ -142,6 +165,7 @@ export function Contact() {
           {/* Right — form */}
           <Reveal delay={0.1}>
             <form
+              ref={formRef}
               onSubmit={handleSubmit}
               className="rounded-2xl border border-border bg-surface p-5 sm:p-6 md:p-8"
             >
@@ -151,24 +175,24 @@ export function Contact() {
                     name="name"
                     type="text"
                     required
-                    placeholder="Jane Doe"
+                    placeholder="Your full name" autoComplete="name"
                     className="input-base"
                   />
                 </Field>
-                <Field label="Work Email" required>
+                <Field label="Email" required>
                   <input
                     name="email"
                     type="email"
                     required
-                    placeholder="jane@company.com"
+                    placeholder="you@example.com" autoComplete="email"
                     className="input-base"
                   />
                 </Field>
-                <Field label="Company Name">
+                <Field label="Business / Company">
                   <input
                     name="company"
                     type="text"
-                    placeholder="Company Inc."
+                    placeholder="Your business or brand" autoComplete="organization"
                     className="input-base"
                   />
                 </Field>
@@ -202,7 +226,7 @@ export function Contact() {
                       name="description"
                       required
                       rows={5}
-                      placeholder="Tell us what you're building, your goals, and your timeline..."
+                      placeholder="Tell us what you need, your goals and when you want to launch..."
                       className="input-base resize-none"
                     />
                   </Field>
@@ -221,12 +245,12 @@ export function Contact() {
                   <div>
                     <div className="font-semibold">Inquiry sent!</div>
                     <div className="text-sm text-foreground-muted">
-                      We&apos;ll be in touch within one business day.
+                      We will contact you within one business day.
                     </div>
                   </div>
                 </div>
               ) : (
-                <div className="mt-6">
+                <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
                   <Magnetic strength={0.25} className="w-full sm:w-auto">
                     <button
                       type="submit"
@@ -249,6 +273,14 @@ export function Contact() {
                       )}
                     </button>
                   </Magnetic>
+                  <button
+                    type="button"
+                    onClick={openFormattedEmail}
+                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-border px-6 py-4 text-sm font-semibold transition-colors hover:border-foreground/40 sm:w-auto"
+                  >
+                    <Mail size={18} aria-hidden="true" />
+                    Send as Email
+                  </button>
                 </div>
               )}
             </form>
@@ -293,9 +325,57 @@ function Field({
     <label className={cn('flex flex-col gap-2')}>
       <span className="text-xs font-medium uppercase tracking-[0.1em] text-foreground-muted">
         {label}
-        {required && <span className="text-lime"> *</span>}
+        {required && <span className="text-red-500"> *</span>}
       </span>
       {children}
     </label>
+  );
+}
+
+function ContactCard({
+  icon,
+  label,
+  value,
+  href,
+  external,
+  title,
+  delay = 0,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  href?: string;
+  external?: boolean;
+  title?: string;
+  delay?: number;
+}) {
+  const inner = (
+    <div className="flex items-center gap-3">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-bg">
+        {icon}
+      </div>
+      <div className="min-w-0">
+        <div className="text-xs uppercase tracking-[0.14em] text-foreground-muted">
+          {label}
+        </div>
+        <div className="break-words font-medium">{value}</div>
+      </div>
+    </div>
+  );
+  return (
+    <Reveal delay={delay}>
+      {href ? (
+        <a
+          href={href}
+          title={title}
+          {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+          className="block rounded-2xl border border-border bg-surface p-5 transition-colors hover:border-foreground/30"
+        >
+          {inner}
+        </a>
+      ) : (
+        <div className="rounded-2xl border border-border bg-surface p-5">{inner}</div>
+      )}
+    </Reveal>
   );
 }

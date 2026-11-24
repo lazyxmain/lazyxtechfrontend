@@ -1,4 +1,4 @@
-import { ArrowUpRight, Globe } from 'lucide-react';
+import { ArrowUpRight, MapPin, ShieldCheck, Smartphone } from 'lucide-react';
 import { Magnetic } from '@/components/magnetic';
 import { HeroVisual } from '@/components/hero-visual';
 
@@ -29,32 +29,31 @@ export function Hero() {
               />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-lime" />
             </span>
-            Available for Global Projects
+            Web & App Development Company · Bhopal, India
           </div>
 
           <h1
             id="hero-title"
             className="mt-5 text-balance font-display text-[2.15rem] font-semibold leading-[1.06] tracking-ultra min-[400px]:text-[2.5rem] sm:mt-6 sm:text-6xl lg:text-[4.2rem]"
           >
-            <span className="hero-in block" style={d(0.1)}>We Build</span>
-            <span className="hero-in block" style={d(0.18)}>Digital Products</span>
+            <span className="hero-in block" style={d(0.1)}>Custom Websites</span>
+            <span className="hero-in block" style={d(0.18)}>&amp; Mobile Apps</span>
             <span className="hero-in block" style={d(0.26)}>
-              That Move{' '}
+              That Grow Your{' '}
+            </span>
+            <span className="hero-in block" style={d(0.34)}>
               <span className="relative inline-block">
-                <span className="relative z-10">Businesses</span>
+                <span className="relative z-10">Business.</span>
                 <span className="hero-underline absolute bottom-1 left-0 h-2.5 w-full bg-lime sm:h-3" />
               </span>
             </span>
-            <span className="hero-in block" style={d(0.34)}>Forward.</span>
           </h1>
 
           <p
             style={d(0.45)}
             className="hero-in mt-6 max-w-xl text-base leading-relaxed text-foreground-muted sm:mt-7 sm:text-lg"
           >
-            From high-performance websites and custom web applications to
-            scalable software and e-commerce platforms, we help ambitious
-            businesses turn ideas into powerful digital experiences.
+            LazyXTech is a web and app development company in Bhopal, Madhya Pradesh. We build fast Next.js and React websites, WordPress sites, Shopify stores and React Native (Expo) mobile apps, with 6 months of support after launch.
           </p>
 
           <div
@@ -63,16 +62,16 @@ export function Hero() {
           >
             <Magnetic href="#contact" strength={0.4} className="w-full min-[420px]:w-auto">
               <span className="group flex items-center justify-center gap-2 rounded-xl bg-foreground px-7 py-3.5 text-sm font-semibold text-background transition-colors hover:bg-lime hover:text-lime-fg">
-                Start a Project
+                Get a Free Quote
                 <ArrowUpRight
                   size={18}
                   className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
                 />
               </span>
             </Magnetic>
-            <Magnetic href="#work" strength={0.3} className="w-full min-[420px]:w-auto">
+            <Magnetic href="#services" strength={0.3} className="w-full min-[420px]:w-auto">
               <span className="group flex items-center justify-center gap-2 rounded-xl border border-border bg-surface/40 px-7 py-3.5 text-sm font-semibold transition-colors hover:border-foreground/30">
-                Explore Our Work
+                View Our Services
                 <ArrowUpRight
                   size={18}
                   className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
@@ -81,13 +80,23 @@ export function Hero() {
             </Magnetic>
           </div>
 
-          <div
+          <ul
             style={d(0.65)}
-            className="hero-in mt-10 flex items-start gap-2 text-xs leading-relaxed text-foreground-muted sm:mt-12"
+            className="hero-in mt-10 flex flex-col gap-3 text-xs text-foreground-muted min-[480px]:flex-row min-[480px]:flex-wrap min-[480px]:gap-x-6 sm:mt-12 sm:text-sm"
           >
-            <Globe size={14} className="mt-0.5 shrink-0 text-lime" />
-            USA · UK · Canada · Australia · Europe · India
-          </div>
+            <li className="flex items-center gap-2">
+              <MapPin size={15} className="shrink-0 text-foreground" aria-hidden="true" />
+              Based in Bhopal, India
+            </li>
+            <li className="flex items-center gap-2">
+              <ShieldCheck size={15} className="shrink-0 text-foreground" aria-hidden="true" />
+              6 months support after launch
+            </li>
+            <li className="flex items-center gap-2">
+              <Smartphone size={15} className="shrink-0 text-foreground" aria-hidden="true" />
+              Next.js · React · WordPress · Shopify · Expo
+            </li>
+          </ul>
         </div>
 
         {/* Visual */}

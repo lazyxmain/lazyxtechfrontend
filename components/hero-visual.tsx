@@ -66,15 +66,11 @@ export function HeroVisual() {
           <div className="flex min-w-0 flex-col rounded-xl border border-border bg-bg p-2.5 sm:p-3.5">
             <div className="flex items-center justify-between">
               <span className="text-[8px] font-medium uppercase tracking-wider text-foreground-muted sm:text-[9px]">
-                Revenue
+                Website traffic
               </span>
-              <span className="rounded-full bg-lime/40 px-1.5 py-0.5 text-[8px] font-bold sm:text-[9px]">
-                +38%
-              </span>
+              <span className="h-1.5 w-1.5 rounded-full bg-lime" />
             </div>
-            <div className="mt-1 font-display text-base font-semibold leading-none sm:text-xl">
-              $48.2k
-            </div>
+            <div className="mt-2 h-2.5 w-14 rounded-full bg-foreground/80 sm:h-3 sm:w-16" />
             <div className="mt-auto flex h-[46%] items-end gap-1 sm:gap-1.5">
               {BARS.map((h, i) => (
                 <span
@@ -135,9 +131,9 @@ export function HeroVisual() {
             />
           </svg>
           <div className="leading-tight">
-            <div className="font-display text-sm font-bold">100</div>
+            <div className="font-display text-sm font-bold">Fast &amp; SEO-ready</div>
             <div className="text-[9px] font-medium uppercase tracking-wider text-foreground-muted">
-              Performance
+              Core Web Vitals
             </div>
           </div>
         </div>
@@ -154,7 +150,7 @@ export function HeroVisual() {
             <span className="text-lime">✓</span> Build passed
           </div>
           <div>
-            <span className="text-lime">✓</span> Live in 38s
+            <span className="text-lime">✓</span> Deployed live
             <span className="hero-caret ml-1 inline-block h-2.5 w-1 translate-y-0.5 bg-lime" />
           </div>
         </div>
@@ -170,7 +166,7 @@ export function HeroVisual() {
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-lime opacity-75" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-lime" />
           </span>
-          <span className="text-[10px] font-semibold">99.9% uptime</span>
+          <span className="text-[10px] font-semibold">6-month support</span>
         </div>
       </div>
     </div>

@@ -5,11 +5,11 @@ import { SectionHeading } from '@/components/section-heading';
 import { Reveal } from '@/components/reveal';
 
 const steps = [
-  { n: '01', title: 'Discover', desc: 'Understand your business, goals and requirements.', icon: Search },
-  { n: '02', title: 'Strategize', desc: 'Define the solution, scope and development roadmap.', icon: Map },
-  { n: '03', title: 'Design & Build', desc: 'Create and develop the digital product.', icon: Code },
-  { n: '04', title: 'Launch', desc: 'Test, deploy and deliver the final solution.', icon: Rocket },
-  { n: '05', title: 'Support & Scale', desc: 'Continue improving and supporting the product.', icon: LifeBuoy },
+  { n: '01', title: 'Discuss', desc: 'A quick call or chat to understand your business, goals and what you need built.', icon: Search },
+  { n: '02', title: 'Proposal', desc: 'A written scope, timeline and cost, so you know exactly what you are getting before we start.', icon: Map },
+  { n: '03', title: 'Design & Build', desc: 'We design and develop in clear milestones, sharing preview links so you can give feedback early.', icon: Code },
+  { n: '04', title: 'Test & Launch', desc: 'Testing on real devices, SEO and speed checks, then we take your project live.', icon: Rocket },
+  { n: '05', title: '6 Months Support', desc: 'After launch we stay available for bug fixes, updates and small changes for 6 months.', icon: LifeBuoy },
 ];
 
 export function Process() {
@@ -21,9 +21,9 @@ export function Process() {
     >
       <div className="mx-auto max-w-[1400px] px-5 md:px-8">
         <SectionHeading
-          tag="Our Process"
+          tag="How We Work"
           titleId="process-title"
-          title="From First Conversation to Final Launch."
+          title="A Simple Process, From First Call to Launch and Beyond."
           className="max-w-4xl"
         />
 

@@ -4,17 +4,17 @@ import { SectionHeading } from '@/components/section-heading';
 import { Reveal } from '@/components/reveal';
 
 const techs = [
-  { name: 'React', group: 'Frontend' },
-  { name: 'Next.js', group: 'Frontend' },
-  { name: 'JavaScript', group: 'Language' },
+  { name: 'Next.js', group: 'Web' },
+  { name: 'React', group: 'Web' },
+  { name: 'React Native', group: 'Mobile' },
+  { name: 'Expo', group: 'Mobile' },
   { name: 'TypeScript', group: 'Language' },
-  { name: 'Tailwind CSS', group: 'Frontend' },
+  { name: 'Tailwind CSS', group: 'Styling' },
+  { name: 'WordPress', group: 'CMS' },
+  { name: 'Shopify', group: 'E-commerce' },
   { name: 'Node.js', group: 'Backend' },
-  { name: 'Fastify', group: 'Backend' },
   { name: 'MongoDB', group: 'Database' },
   { name: 'MySQL', group: 'Database' },
-  { name: 'Redis', group: 'Database' },
-  { name: 'Shopify', group: 'Platform' },
 ];
 
 export function TechStack() {
@@ -32,8 +32,8 @@ export function TechStack() {
         <SectionHeading
           tag="Technology"
           titleId="tech-title"
-          title="Built With Modern Technology."
-          description="A curated ecosystem of reliable, proven tools, chosen to match each project's needs."
+          title="Modern Tools, Chosen for Your Project."
+          description="We use proven technology for websites, stores and mobile apps, and pick what suits your goals and budget, not what is trendy."
           align="center"
           className="mx-auto items-center"
         />

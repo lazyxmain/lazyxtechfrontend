@@ -20,7 +20,8 @@ export function About() {
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src="/images/about-poster.svg"
-                    alt="LazyXTech poster: technology that solves real business problems"
+                    alt="LazyXTech poster: technology that solves real business problems, web and app development company in Bhopal"
+                    title="LazyXTech - Web and App Development Company in Bhopal"
                     width={800}
                     height={1000}
                     loading="lazy"
@@ -53,32 +54,32 @@ export function About() {
             <SmokeText
               as="h2"
               id="about-title"
-              text="Small Team. Big Digital Ambitions."
+              text="A Bhopal Team Building Digital Products That Work."
               className="mt-5 text-balance font-display text-[1.75rem] font-semibold leading-[1.12] tracking-tightest sm:text-4xl lg:text-[2.8rem]"
             />
             <div className="mt-6 space-y-4 text-base leading-relaxed text-foreground-muted sm:mt-7 sm:space-y-5 sm:text-lg">
               <SmokeText
-                text="LazyXTech is a technology-focused digital agency built around one simple idea: great technology should solve real business problems."
-                stagger={14}
+                text="LazyXTech is a web and app development company based in Bhopal, Madhya Pradesh. We help startups, shops, clinics, institutes and growing businesses get online with websites, stores and mobile apps that are fast, reliable and easy to use."
+                stagger={12}
                 delay={0.1}
               />
               <SmokeText
-                text="We partner with businesses and founders to design, develop and deliver digital products that are reliable, scalable and built for growth."
-                stagger={14}
+                text="Our approach is simple: listen first, agree on scope and timeline in writing, build in clear milestones, and stay available after launch with 6 months of support."
+                stagger={12}
                 delay={0.2}
               />
               <SmokeText
-                text="Our approach combines thoughtful design, modern engineering and transparent collaboration."
-                stagger={14}
+                text="Whether you are a local business in Bhopal or a client overseas, you work directly with the people building your product, by phone, WhatsApp or email."
+                stagger={12}
                 delay={0.3}
               />
             </div>
 
             <Reveal delay={0.2}>
-              <dl className="mt-9 grid grid-cols-3 gap-4 sm:mt-10 sm:flex sm:flex-wrap sm:gap-10">
-                <Stat value="6" label="Target Markets" />
-                <Stat value="4" label="Core Capabilities" />
-                <Stat value="∞" label="Iteration Cycles" />
+              <dl className="mt-9 grid grid-cols-3 gap-4 sm:mt-10 sm:flex sm:flex-wrap sm:gap-12">
+                <Stat value="6 mo" label="Post-launch support" />
+                <Stat value="4" label="Core services" />
+                <Stat value="Bhopal" label="Based in India" />
               </dl>
             </Reveal>
           </div>
