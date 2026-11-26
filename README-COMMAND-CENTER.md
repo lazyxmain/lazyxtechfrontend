@@ -48,3 +48,18 @@ Configure these repository Actions secrets before enabling the workflow:
 `GSC_PROPERTY_URL` defaults to `https://lazyxtech.com/`. Change the workflow environment if your Search Console property uses a domain property or a different canonical host.
 
 The job performs a bounded same-origin crawl (up to 20 pages), records a technical audit and notifications, checks Search Console when credentials are present, and creates AI blog drafts only when Ollama is reachable. Drafts are never published automatically.
+
+## Current free-tier deployment behaviour
+
+The active dashboard API is the existing Render service `lazyxtech-api` (free web service). The optional in-process scheduler starts when `ENABLE_INLINE_WORKER=true` is set on that API service. It records a heartbeat every minute and runs the technical crawl, Search Console sync, weekly competitor check and three-day AI draft task. No separate paid Render worker or cron service is created.
+
+**Free-tier limitation:** Render free web services can spin down after inactivity. The in-process scheduler cannot execute while the service is asleep; the dashboard/API request wakes it again. For reliable daily monitoring while the service is asleep, the optional GitHub Actions workflow can run independently after `MONGODB_URI` is added as a repository Actions secret. That workflow is configured to skip its job step when the secret is absent.
+
+## Integrations and ranking
+
+- Google Search Console service-account JSON and the exact verified `GSC_PROPERTY_URL` are required for real clicks, impressions, CTR, average position, queries and ranking opportunities.
+- Enable the Google PageSpeed Insights API in Google Cloud and set its free API key as `PAGESPEED_API_KEY` in Render to run Lighthouse checks.
+- Ollama is free/open-source, but a hosted Render API cannot reach Ollama running on a developer laptop through `localhost`. Set `OLLAMA_BASE_URL` to a reachable Ollama endpoint if scheduled cloud drafts are required. No paid LLM API is required.
+- Competitor monitoring checks public website reachability and metadata only; it does not claim to provide competitor Google keyword rankings or backlink data.
+- Blog generation creates review-only drafts. The public website's CMS/publishing integration is not yet configured, so approval does not publish a post live.
+- No tool can guarantee Google ranking positions. The dashboard surfaces verified Search Console opportunities and technical fixes to support SEO work.
