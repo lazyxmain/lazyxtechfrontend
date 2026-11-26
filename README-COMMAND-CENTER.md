@@ -9,7 +9,7 @@ The existing public website remains at the repository root. The repository is no
 
 ## Database
 
-MongoDB Atlas is the database target. Render is not required for MongoDB or workers.
+MongoDB Atlas is the database target. The existing Render API service can host the optional inline scheduler without creating another paid service.
 
 ## Local setup
 
@@ -27,13 +27,13 @@ Or use Docker Compose after creating services/backend/.env.
 - The dashboard never fabricates Search Console or Analytics numbers.
 - SEO score is deterministic from recorded audit rules.
 - AI is optional; Ollama is the intended local provider.
-- Free hosting platforms may sleep or terminate workers. For reliable scheduled execution, run the worker in Docker on a machine that stays online.
+- The free Render web service may sleep during inactivity; scheduled jobs only execute while its process is awake. The optional GitHub Actions workflow can provide an independent daily run after its MongoDB secret is configured.
 - Google OAuth, Search Console, GA4, PageSpeed and email credentials must be configured before those integrations can return live data.
 - The current branch is an implementation foundation, not a claim that every requested production integration is already complete.
 
 ## Existing deployment
 
-Do not delete the current live Render setup yet. First validate this branch locally and then switch deployment deliberately. MongoDB Atlas can remain external.
+Keep the existing Render API service and MongoDB Atlas. Merge this tested branch to main to deploy the dashboard/backend changes; then set ENABLE_INLINE_WORKER=true on the active lazyxtech-api service.
 
 ## Scheduled monitoring (GitHub Actions)
 
