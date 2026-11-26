@@ -14,9 +14,11 @@ export async function getSearchConsoleSummary(days:number){
  const dateRange={startDate:fmt(start),endDate:fmt(end)};
  const [totals,queries,pages]=await Promise.all([
   client.searchanalytics.query({siteUrl:env.GSC_PROPERTY_URL,requestBody:{...dateRange,rowLimit:1}}),
-  client.searchanalytics.query({siteUrl:env.GSC_PROPERTY_URL,requestBody:{...dateRange,dimensions:['query'],rowLimit:10}}),
+  client.searchanalytics.query({siteUrl:env.GSC_PROPERTY_URL,requestBody:{...dateRange,dimensions:['query'],rowLimit:50}}),
   client.searchanalytics.query({siteUrl:env.GSC_PROPERTY_URL,requestBody:{...dateRange,dimensions:['page'],rowLimit:10}})
  ]);
  const row=totals.data.rows?.[0];
- return {connected:true,property:env.GSC_PROPERTY_URL,range:dateRange,metrics:{clicks:row?.clicks??0,impressions:row?.impressions??0,ctr:row?.ctr??0,position:row?.position??null},queries:(queries.data.rows||[]).map(x=>({query:x.keys?.[0]||'',clicks:x.clicks??0,impressions:x.impressions??0,ctr:x.ctr??0,position:x.position??null})),pages:(pages.data.rows||[]).map(x=>({page:x.keys?.[0]||'',clicks:x.clicks??0,impressions:x.impressions??0,ctr:x.ctr??0,position:x.position??null}))};
+ const queryRows=(queries.data.rows||[]).map(x=>({query:x.keys?.[0]||'',clicks:x.clicks??0,impressions:x.impressions??0,ctr:x.ctr??0,position:x.position??null}));
+ const opportunities=queryRows.filter(x=>x.position!=null&&x.position>=4&&x.position<=20&&x.impressions>=5).sort((a,b)=>b.impressions-a.impressions).slice(0,10);
+ return {connected:true,property:env.GSC_PROPERTY_URL,range:dateRange,metrics:{clicks:row?.clicks??0,impressions:row?.impressions??0,ctr:row?.ctr??0,position:row?.position??null},opportunities,queries:queryRows.sort((a,b)=>b.clicks-a.clicks).slice(0,10),pages:(pages.data.rows||[]).map(x=>({page:x.keys?.[0]||'',clicks:x.clicks??0,impressions:x.impressions??0,ctr:x.ctr??0,position:x.position??null}))};
 }
