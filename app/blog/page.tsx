@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import {ArrowRight,BookOpen,CalendarDays,Clock3,Sparkles} from 'lucide-react';
-import {SITE_NAME,SITE_URL} from '@/lib/site';
+import {SITE_NAME} from '@/lib/site';
 
 export const dynamic='force-dynamic';
 type Blog={slug:string;title:string;excerpt?:string;publishedAt?:string;createdAt?:string;seo?:{topic?:string}};
