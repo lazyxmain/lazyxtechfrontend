@@ -28,7 +28,7 @@ app.get('/api/automation/status',{preHandler:(app as any).auth},async()=>{
  return {worker:{status:online?'online':heartbeat?.lastStatus==='error'?'error':'offline',lastHeartbeat:heartbeat?.lastRunAt||null,lastError:heartbeat?.lastError||null},schedules:records.filter((x:any)=>x.key!=='worker-heartbeat').map((x:any)=>({key:x.key,label:x.label,cron:x.cron,enabled:x.enabled,lastRunAt:x.lastRunAt,lastStatus:x.lastStatus,lastError:x.lastError}))};
 });
 app.get('/api/ai/status',{preHandler:(app as any).auth},async()=>{
- try{const response=await fetch(env.OLLAMA_BASE_URL.replace(/\\/$/,'')+'/api/tags',{signal:AbortSignal.timeout(2500)});if(!response.ok)throw new Error('Ollama unavailable');const body:any=await response.json();const models=(body.models||[]).map((x:any)=>x.name);return {available:true,provider:'Ollama (local)',model:models.includes(env.OLLAMA_MODEL)?env.OLLAMA_MODEL:(models[0]||env.OLLAMA_MODEL),models,message:'Local AI provider is reachable. Blog generation is enabled for drafts.'};}
+ try{const response=await fetch((env.OLLAMA_BASE_URL.endsWith('/')?env.OLLAMA_BASE_URL.slice(0,-1):env.OLLAMA_BASE_URL)+'/api/tags',{signal:AbortSignal.timeout(2500)});if(!response.ok)throw new Error('Ollama unavailable');const body:any=await response.json();const models=(body.models||[]).map((x:any)=>x.name);return {available:true,provider:'Ollama (local)',model:models.includes(env.OLLAMA_MODEL)?env.OLLAMA_MODEL:(models[0]||env.OLLAMA_MODEL),models,message:'Local AI provider is reachable. Blog generation is enabled for drafts.'};}
  catch{return {available:false,provider:'Ollama (local)',model:env.OLLAMA_MODEL,message:'Start Ollama and pull the configured model to enable AI draft generation. No paid API key is required.'};}
 });
 app.get('/api/integrations/status',{preHandler:(app as any).auth},async()=>({integrations:[
@@ -40,10 +40,10 @@ app.get('/api/integrations/status',{preHandler:(app as any).auth},async()=>({int
 app.post('/api/ai/blog-draft',{preHandler:(app as any).auth},async(req:any,reply)=>{
  const topic=String(req.body?.topic||'').trim().slice(0,180);if(!topic)return reply.code(400).send({error:'A blog topic is required.'});
  try{
-  const response=await fetch(env.OLLAMA_BASE_URL.replace(/\\/$/,'')+'/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:env.OLLAMA_MODEL,stream:false,prompt:'Write an original, helpful SEO blog article for LazyXTech about: '+topic+'. Return clear Markdown with an H1 title, introduction, descriptive H2 sections, practical advice, FAQ and conclusion. Avoid fabricated statistics and keyword stuffing.'}),signal:AbortSignal.timeout(180000)});
+  const response=await fetch((env.OLLAMA_BASE_URL.endsWith('/')?env.OLLAMA_BASE_URL.slice(0,-1):env.OLLAMA_BASE_URL)+'/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:env.OLLAMA_MODEL,stream:false,prompt:'Write an original, helpful SEO blog article for LazyXTech about: '+topic+'. Return clear Markdown with an H1 title, introduction, descriptive H2 sections, practical advice, FAQ and conclusion. Avoid fabricated statistics and keyword stuffing.'}),signal:AbortSignal.timeout(180000)});
   if(!response.ok)throw new Error('Ollama generation failed. Confirm the model is downloaded and the local AI service is running.');
   const generated:any=await response.json();const content=String(generated.response||'').trim();if(!content)throw new Error('The AI model returned an empty draft.');
-  const title=content.split('\\n').find((line:string)=>line.startsWith('# '))?.replace(/^#\\s*/,'')||topic;
+  const title=content.split(String.fromCharCode(10)).find((line:string)=>line.startsWith('# '))?.replace(/^# +/,'')||topic;
   const slug=title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,90)+'-'+Date.now().toString().slice(-6);
   const draft=await Blog.create({slug,title,excerpt:'AI-assisted draft. Review and fact-check before publishing.',content,status:'draft',seo:{source:'ollama',topic}});
   await Notification.create({type:'content_draft',title:'Blog draft ready for review',message:title,metadata:{blogId:draft._id,slug}});
