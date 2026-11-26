@@ -26,10 +26,10 @@ Or use Docker Compose after creating services/backend/.env.
 
 - The dashboard never fabricates Search Console or Analytics numbers.
 - SEO score is deterministic from recorded audit rules.
-- AI is optional; Ollama is the intended local provider.
+- AI blog drafts support Google Gemini API free tier (with an owner-provided key) or self-hosted Ollama.
 - The free Render web service may sleep during inactivity; scheduled jobs only execute while its process is awake. The optional GitHub Actions workflow can provide an independent daily run after its MongoDB secret is configured.
 - Google OAuth, Search Console, GA4, PageSpeed and email credentials must be configured before those integrations can return live data.
-- The current branch is an implementation foundation, not a claim that every requested production integration is already complete.
+- Public blog pages are generated from approved dashboard articles; review is required before publication.
 
 ## Existing deployment
 
@@ -43,11 +43,11 @@ Configure these repository Actions secrets before enabling the workflow:
 
 - `MONGODB_URI` — the same MongoDB Atlas connection string used by the Render API.
 - `GOOGLE_SERVICE_ACCOUNT_JSON` — optional service-account JSON. Add its email as a user on the verified Search Console property.
-- `OLLAMA_BASE_URL` — optional reachable Ollama endpoint. GitHub-hosted runners cannot access Ollama on your personal computer via localhost; use a reachable private-network tunnel or hosted Ollama endpoint if scheduled AI drafts are desired.
+- `GEMINI_API_KEY` — optional Google AI Studio free-tier key for hosted AI article drafts.\n- `OLLAMA_BASE_URL` — optional reachable Ollama endpoint. GitHub-hosted runners cannot access Ollama on your personal computer via localhost.
 
 `GSC_PROPERTY_URL` defaults to `https://lazyxtech.com/`. Change the workflow environment if your Search Console property uses a domain property or a different canonical host.
 
-The job performs a bounded same-origin crawl (up to 20 pages), records a technical audit and notifications, checks Search Console when credentials are present, and creates AI blog drafts only when Ollama is reachable. Drafts are never published automatically.
+The job performs a bounded same-origin crawl (up to 20 pages), records a technical audit and notifications, checks Search Console when credentials are present, and creates AI blog drafts when Gemini or a reachable Ollama provider is configured. Drafts are never published automatically.
 
 ## Current free-tier deployment behaviour
 
@@ -59,7 +59,7 @@ The active dashboard API is the existing Render service `lazyxtech-api` (free we
 
 - Google Search Console service-account JSON and the exact verified `GSC_PROPERTY_URL` are required for real clicks, impressions, CTR, average position, queries and ranking opportunities.
 - Enable the Google PageSpeed Insights API in Google Cloud and set its free API key as `PAGESPEED_API_KEY` in Render to run Lighthouse checks.
-- Ollama is free/open-source, but a hosted Render API cannot reach Ollama running on a developer laptop through `localhost`. Set `OLLAMA_BASE_URL` to a reachable Ollama endpoint if scheduled cloud drafts are required. No paid LLM API is required.
+- Google AI Studio offers a free-tier Gemini API; set `GEMINI_API_KEY` and optionally `GEMINI_MODEL=gemini-2.5-flash` on Render to enable hosted drafts without a paid LLM plan. Ollama is also free/open-source, but a hosted Render API cannot reach Ollama running on a developer laptop through `localhost`.
 - Competitor monitoring checks public website reachability and metadata only; it does not claim to provide competitor Google keyword rankings or backlink data.
-- Blog generation creates review-only drafts. The public website's CMS/publishing integration is not yet configured, so approval does not publish a post live.
+- Blog generation creates review-only drafts. Approving a draft exposes it at `/blog` and `/blog/[slug]` on the public website, and the sitemap includes approved articles.
 - No tool can guarantee Google ranking positions. The dashboard surfaces verified Search Console opportunities and technical fixes to support SEO work.
