@@ -1,4 +1,4 @@
-import Fastify from 'fastify'; import cors from '@fastify/cors'; import cookie from '@fastify/cookie'; import jwt from '@fastify/jwt'; import {scryptSync,timingSafeEqual} from 'node:crypto'; import {env} from './config.js'; import {connectDb} from './db.js'; import {User,Lead,Notification,Website,SEOAudit} from './models.js'; import {crawl} from './seo.js'; import {googleAuthUrl,verifyGoogleCode} from './google.js'; import {getSearchConsoleSummary,searchConsoleConfigured} from './search-console.js'; import {Blog,AutomationSchedule} from './models.js';
+import Fastify from 'fastify'; import cors from '@fastify/cors'; import cookie from '@fastify/cookie'; import jwt from '@fastify/jwt'; import {scryptSync,timingSafeEqual} from 'node:crypto'; import {env} from './config.js'; import {connectDb} from './db.js'; import {User,Lead,Notification,Website,SEOAudit} from './models.js'; import {crawl} from './seo.js'; import {googleAuthUrl,verifyGoogleCode} from './google.js'; import {getSearchConsoleSummary,searchConsoleConfigured} from './search-console.js'; import {Blog,AutomationSchedule,Competitor} from './models.js';
 const app=Fastify({logger:true});
 await app.register(cors,{origin:env.CORS_ORIGIN,credentials:true}); await app.register(cookie); await app.register(jwt,{secret:env.JWT_SECRET,cookie:{cookieName:'lx_session',signed:false}});
 app.get('/',async()=>({ok:true,service:'LazyXTech API',health:'/health'}));
@@ -15,6 +15,21 @@ app.get('/api/pagespeed',{preHandler:(app as any).auth},async()=>{const url=env.
 app.get('/api/audits/latest',{preHandler:(app as any).auth},async()=>SEOAudit.findOne().sort({createdAt:-1}).lean());
 app.post('/api/audits/run',{preHandler:(app as any).auth},async(req:any,reply)=>{const website=await Website.findOne({active:true});if(!website)return reply.code(400).send({error:'No active website configured'});const result=await crawl(website.url);const issues:any[]=[];for(const page of result.pages||[]){if(!page.title)issues.push({type:'missing_title',severity:'high',url:page.url});if(!page.description)issues.push({type:'missing_meta_description',severity:'medium',url:page.url});if(page.h1!==1)issues.push({type:'h1_count',severity:'medium',url:page.url,details:{count:page.h1}});if(page.imagesMissingAlt)issues.push({type:'missing_alt',severity:'low',url:page.url,details:{count:page.imagesMissingAlt}});if(page.status>=400||page.status===0)issues.push({type:'http_status',severity:'high',url:page.url,details:{status:page.status}});}const score=Math.max(0,100-(issues.filter((i:any)=>i.severity==='high').length*10)-(issues.filter((i:any)=>i.severity==='medium').length*5)-(issues.filter((i:any)=>i.severity==='low').length*2));return SEOAudit.create({websiteId:website._id,startedAt:new Date(),completedAt:new Date(),score,summary:result,issues});});
 app.post('/api/leads',{config:{rateLimit:{max:20,timeWindow:'1 minute'}} as any},async(req:any)=>Lead.create(req.body));
+
+app.get('/api/competitors',{preHandler:(app as any).auth},async()=>({items:await Competitor.find().sort({createdAt:-1}).lean()}));
+app.post('/api/competitors',{preHandler:(app as any).auth},async(req:any,reply)=>{
+ const raw=String(req.body?.domain||'').trim();let url:URL;
+ try{url=new URL(raw.includes('://')?raw:'https://'+raw);if(!['http:','https:'].includes(url.protocol))throw new Error();}catch{return reply.code(400).send({error:'Enter a valid public website domain.'});}
+ if(url.hostname==='localhost'||/^127\\./.test(url.hostname)||/^10\\./.test(url.hostname)||/^192\\.168\\./.test(url.hostname)||/^172\\.(1[6-9]|2[0-9]|3[01])\\./.test(url.hostname))return reply.code(400).send({error:'Private network addresses cannot be monitored.'});
+ if(await Competitor.countDocuments()>=5)return reply.code(400).send({error:'The free watchlist supports up to five competitors.'});
+ const domain=url.hostname.toLowerCase();const existing=await Competitor.findOne({domain});if(existing)return {ok:true,item:existing};
+ const item=await Competitor.create({domain,url:url.origin,status:'tracking'});await Notification.create({type:'competitor_added',title:'Competitor added to watchlist',message:domain});return reply.code(201).send({ok:true,item});
+});
+app.post('/api/competitors/:id/check',{preHandler:(app as any).auth},async(req:any,reply)=>{
+ const item=await Competitor.findById(req.params.id);if(!item)return reply.code(404).send({error:'Competitor not found'});
+ try{const result=await crawl(item.url);item.title=result.title;item.description=result.description;item.status=result.status>=200&&result.status<400?'reachable':'issue';item.lastCheckedAt=new Date();item.lastError=undefined;await item.save();return item;}catch(error:any){item.status='error';item.lastCheckedAt=new Date();item.lastError=String(error?.message||error);await item.save();return reply.code(502).send({error:'Competitor check failed.'});}
+});
+
 app.get('/api/leads',{preHandler:(app as any).auth},async(req:any)=>{const page=Math.max(1,Number(req.query?.page||1));const limit=Math.min(100,Math.max(1,Number(req.query?.limit||25)));return {items:await Lead.find().sort({createdAt:-1}).skip((page-1)*limit).limit(limit).lean(),page,limit}});
 app.get('/api/notifications',{preHandler:(app as any).auth},async()=>Notification.find().sort({createdAt:-1}).limit(100).lean());
 
