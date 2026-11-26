@@ -4,7 +4,7 @@ import {SITE_NAME} from '@/lib/site';
 
 export const dynamic='force-dynamic';
 type Blog={slug:string;title:string;excerpt?:string;publishedAt?:string;createdAt?:string;seo?:{topic?:string}};
-const api=(process.env.NEXT_PUBLIC_API_URL||'https://lazyxtech-api.onrender.com').replace(/\\/$/,'');
+const api=(process.env.NEXT_PUBLIC_API_URL||'https://lazyxtech-api.onrender.com').replace(/\/$/,'');
 async function getBlogs():Promise<Blog[]>{try{const r=await fetch(api+'/api/public/blogs',{cache:'no-store',signal:AbortSignal.timeout(9000)});if(!r.ok)return [];const data=await r.json();return Array.isArray(data)?data:[]}catch{return []}}
 export const metadata={title:'Insights & Resources',description:'Practical guides on website development, SEO, WordPress, Shopify and digital growth from LazyXTech.',alternates:{canonical:'/blog'},openGraph:{title:'LazyXTech Insights & Resources',description:'Practical guides for better websites and sustainable digital growth.',url:'/blog',type:'website'}};
 function date(value?:string){if(!value)return 'Recently published';const d=new Date(value);return Number.isNaN(d.getTime())?'Recently published':d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}
