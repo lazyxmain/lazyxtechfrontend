@@ -29,7 +29,7 @@ async function request(path:string,options:RequestInit={}):Promise<Payload>{
 
 export default function Section({params}:{params:{section:string}}){
   const section=params.section;
-  const [data,setData]=useState<Payload|null>(null);
+  const [data,setData]=useState<any>(null);
   const [loading,setLoading]=useState(true);
   const [running,setRunning]=useState(false);
   const [error,setError]=useState('');
