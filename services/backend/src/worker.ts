@@ -1,6 +1,6 @@
 import cron from 'node-cron';
 import {connectDb} from './db.js';
-import {AutomationSchedule,Website,SEOAudit,Notification,Blog} from './models.js';
+import {AutomationSchedule,Website,SEOAudit,Notification,Blog,Competitor} from './models.js';
 import {crawl} from './seo.js';
 import {getSearchConsoleSummary,searchConsoleConfigured} from './search-console.js';
 import {env} from './config.js';
