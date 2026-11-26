@@ -1,3 +1,36 @@
-import {chromium} from 'playwright'; import * as cheerio from 'cheerio';
-export async function crawl(url:string){const browser=await chromium.launch({headless:true});try{const page=await browser.newPage();const response=await page.goto(url,{waitUntil:'domcontentloaded',timeout:30000});const html=await page.content();const $=cheerio.load(html);const links:string[]=[];$('a[href]').each((_,el)=>{const href=$(el).attr('href');if(href)links.push(href)});const imagesMissingAlt=$('img').filter((_,el)=>!$(el).attr('alt')).length;const title=$('title').text().trim();const description=$('meta[name="description"]').attr('content')||'';const h1=$('h1').length;const canonical=$('link[rel="canonical"]').attr('href')||'';return {status:response?.status()??0,title,description,h1,canonical,imagesMissingAlt,links,robots:await robots(url)};}finally{await browser.close();}}
-async function robots(url:string){try{const u=new URL('/robots.txt',url);const r=await fetch(u);return {status:r.status,content:await r.text()};}catch{return {status:0,content:''}}}
+import {chromium} from 'playwright';
+import * as cheerio from 'cheerio';
+
+type PageAudit={url:string,status:number,title:string,description:string,h1:number,canonical:string,imagesMissingAlt:number,links:string[]};
+export async function crawl(startUrl:string){
+ const origin=new URL(startUrl).origin;
+ const browser=await chromium.launch({headless:true});
+ try{
+  const page=await browser.newPage({userAgent:'LazyXTechSEOAudit/1.0 (+https://lazyxtech.com)'});
+  const queue=[new URL(startUrl).toString()];
+  const visited=new Set<string>();
+  const pages:PageAudit[]=[];
+  const maxPages=20;
+  while(queue.length&&pages.length<maxPages){
+   const current=queue.shift()!;
+   const normalized=new URL(current);normalized.hash='';
+   const target=normalized.toString();
+   if(visited.has(target))continue;
+   visited.add(target);
+   try{
+    const response=await page.goto(target,{waitUntil:'domcontentloaded',timeout:25000});
+    const html=await page.content();
+    const $=cheerio.load(html);
+    const links:string[]=[];
+    $('a[href]').each((_,el)=>{const href=$(el).attr('href');if(!href)return;try{const absolute=new URL(href,target);if(absolute.origin===origin&&['http:','https:'].includes(absolute.protocol)){absolute.hash='';absolute.search='';links.push(absolute.toString());}}catch{}});
+    const audit:PageAudit={url:target,status:response?.status()??0,title:$('title').text().trim(),description:$('meta[name="description"]').attr('content')||'',h1:$('h1').length,canonical:$('link[rel="canonical"]').attr('href')||'',imagesMissingAlt:$('img').filter((_,el)=>!$(el).attr('alt')).length,links:[...new Set(links)]};
+    pages.push(audit);
+    for(const link of audit.links){if(!visited.has(link)&&queue.length<maxPages*3)queue.push(link);}
+   }catch(error){pages.push({url:target,status:0,title:'',description:'',h1:0,canonical:'',imagesMissingAlt:0,links:[]});}
+  }
+  const root=pages[0]||{url:startUrl,status:0,title:'',description:'',h1:0,canonical:'',imagesMissingAlt:0,links:[]};
+  const brokenLinks=pages.filter(p=>p.status>=400||p.status===0).map(p=>({url:p.url,status:p.status}));
+  return {...root,robots:await robots(startUrl),pages,totalPages:pages.length,brokenLinks,crawlLimit:maxPages};
+ }finally{await browser.close();}
+}
+async function robots(url:string){try{const u=new URL('/robots.txt',url);const r=await fetch(u,{signal:AbortSignal.timeout(8000)});return {status:r.status,content:await r.text()};}catch{return {status:0,content:''}}}

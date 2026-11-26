@@ -1,10 +1,36 @@
 'use client';
 import {useEffect,useState} from 'react';
-import {Activity,CheckCircle2,Clock3,Gauge,Search,ShieldCheck} from 'lucide-react';
-const API=process.env.NEXT_PUBLIC_API_URL||'http://localhost:4000';
-export default function Home(){const [d,setD]=useState<any>(null);const [audit,setAudit]=useState<any>(null);
- useEffect(()=>{Promise.all([fetch(API+'/api/overview',{credentials:'include'}).then(r=>r.json()),fetch(API+'/api/audits/latest',{credentials:'include'}).then(r=>r.ok?r.json():null)]).then(([a,b])=>{setD(a);setAudit(b)})},[]);
- return <div className="page"><div className="page-head"><div><p className="eyebrow">OVERVIEW</p><h2>Good morning, LazyXTech 👋</h2><p className="muted">Your private SEO, analytics and automation control center.</p></div></div>
- <div className="stat-grid"><Stat label="SEO score" value={audit?.score!=null?audit.score+'/100':'—'} icon={<Gauge/>}/><Stat label="Organic clicks" value="—" icon={<Activity/>}/><Stat label="Impressions" value="—" icon={<Search/>}/><Stat label="System" value="Online" icon={<CheckCircle2/>}/></div>
- <div className="two-col"><section className="panel"><h3>Performance</h3><div className="empty"><Activity/><strong>Connect Google Search Console</strong><span>Once connected, verified clicks, impressions, CTR and position will appear here.</span></div></section><section className="panel"><h3>Automation health</h3><div className="health"><div><ShieldCheck/><span>Technical SEO</span><b>Scheduled</b></div><div><Clock3/><span>Reports</span><b>Scheduled</b></div><div><Gauge/><span>PageSpeed</span><b>On demand</b></div></div></section></div></div>}
-function Stat({label,value,icon}:{label:string,value:string,icon:React.ReactNode}){return <div className="stat"><div className="stat-icon">{icon}</div><div><div className="muted">{label}</div><strong>{value}</strong></div></div>}
+import {Activity,AlertCircle,ArrowUpRight,CheckCircle2,Clock3,FileSearch,Gauge,RefreshCw,Search,ShieldCheck,Zap} from 'lucide-react';
+const API='/api';
+const fmt=(v:any)=>v==null?'—':Number(v).toLocaleString('en-IN',{maximumFractionDigits:2});
+export default function Home(){
+ const [gsc,setGsc]=useState<any>(null);const [audit,setAudit]=useState<any>(null);const [automation,setAutomation]=useState<any>(null);const [loading,setLoading]=useState(true);
+ const load=()=>{setLoading(true);Promise.all([
+ fetch(API+'/search-console/summary?days=28',{credentials:'include'}).then(r=>r.json()),
+ fetch(API+'/audits/latest',{credentials:'include'}).then(r=>r.ok?r.json():null),
+ fetch(API+'/automation/status',{credentials:'include'}).then(r=>r.ok?r.json():null)
+ ]).then(([s,a,j])=>{setGsc(s);setAudit(a);setAutomation(j)}).finally(()=>setLoading(false))};
+ useEffect(()=>{load()},[]);
+ const schedules=automation?.schedules||[];
+ return <div className="page">
+ <div className="page-head"><div><p className="eyebrow">OVERVIEW</p><h2>Welcome to your command center</h2><p className="muted">A clear view of website health, organic search and background monitoring.</p></div><button className="icon-btn" onClick={load} aria-label="Refresh dashboard"><RefreshCw size={16}/></button></div>
+ <div className="metric-grid">
+ <Metric label="Technical SEO score" value={audit?.score==null?'—':audit.score+'/100'} detail={audit?.completedAt?'Latest recorded audit':'Run your first audit'} icon={Gauge}/>
+ <Metric label="Organic clicks" value={gsc?.connected?fmt(gsc.metrics?.clicks):'—'} detail={gsc?.connected?'Google Search Console · 28 days':'Connect Search Console'} icon={Activity}/>
+ <Metric label="Impressions" value={gsc?.connected?fmt(gsc.metrics?.impressions):'—'} detail={gsc?.connected?'Google Search Console · 28 days':'Verified data only'} icon={Search}/>
+ <Metric label="Worker status" value={automation?.worker?.status==='online'?'Online':'Unknown'} detail={automation?.worker?.lastHeartbeat?'Heartbeat received':'Waiting for worker heartbeat'} icon={Zap}/>
+ </div>
+ <div className="two-col">
+ <section className="panel"><div className="panel-heading"><div><h3>Google Search Console</h3><p className="muted">Organic search performance</p></div><Search/></div>
+ {gsc?.connected?<div className="overview-stats"><div><small>Click-through rate</small><b>{(gsc.metrics.ctr*100).toFixed(2)}%</b></div><div><small>Average position</small><b>{Number(gsc.metrics.position).toFixed(1)}</b></div></div>:<div className="empty"><AlertCircle/><strong>Search Console is not connected</strong><span>Open Settings to configure the Google service account and verified property.</span></div>}
+ </section>
+ <section className="panel"><div className="panel-heading"><div><h3>Monitoring health</h3><p className="muted">Background worker and scheduled jobs</p></div><ShieldCheck/></div>
+ <div className="health"><div><ShieldCheck/><span>Worker heartbeat</span><b>{automation?.worker?.status==='online'?'Online':'Unknown'}</b></div>{schedules.slice(0,3).map((job:any)=><div key={job.key}><Clock3/><span>{job.label||job.key}</span><b>{job.lastStatus||'Waiting'}</b></div>)}</div>
+ </section>
+ </div>
+ <section className="panel overview-audit"><div className="panel-heading"><div><h3>Latest technical audit</h3><p className="muted">Deterministic checks, not generated placeholder scores</p></div><FileSearch/></div>
+ {audit?<div className="overview-stats"><div><small>SEO score</small><b>{audit.score}/100</b></div><div><small>Issues detected</small><b>{audit.issues?.length||0}</b></div><div><small>Last completed</small><b>{new Date(audit.completedAt||audit.createdAt).toLocaleString()}</b></div></div>:<div className="table-empty">{loading?'Loading monitoring data…':'No audit has been recorded yet. Open Technical Audit and run your first crawl.'}</div>}
+ </section>
+ </div>;
+}
+function Metric({label,value,detail,icon:Icon}:{label:string,value:string,detail:string,icon:any}){return <div className="metric-card"><div className="metric-top"><span>{label}</span><Icon size={17}/></div><strong>{value}</strong><small>{detail}</small></div>}
