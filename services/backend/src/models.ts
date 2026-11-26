@@ -1,6 +1,6 @@
 import mongoose,{Schema} from 'mongoose';
 const common={timestamps:true};
-const c=(name:string)=>({collection:'lazytech_'+name});
+const c=(name:string)=>'lazytech_'+name;
 export const User=mongoose.model('User',new Schema({email:{type:String,unique:true,index:true,required:true},name:String,passwordHash:String,googleId:String,verified:{type:Boolean,default:false},role:{type:String,default:'owner'}},common),c('users'));
 export const Website=mongoose.model('Website',new Schema({url:{type:String,required:true,index:true},name:String,active:{type:Boolean,default:true}},common),c('websites'));
 export const SEOAudit=mongoose.model('SEOAudit',new Schema({websiteId:Schema.Types.ObjectId,startedAt:Date,completedAt:Date,score:Number,summary:Schema.Types.Mixed,issues:[Schema.Types.Mixed]},common),c('seo_audits'));
