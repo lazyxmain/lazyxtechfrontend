@@ -51,4 +51,5 @@ app.post('/api/ai/blog-draft',{preHandler:(app as any).auth},async(req:any,reply
  }catch(error:any){app.log.error(error);return reply.code(503).send({error:String(error?.message||'AI draft generation is unavailable').slice(0,300)});}
 });
 app.get('/api/blogs',{preHandler:(app as any).auth},async()=>Blog.find().sort({createdAt:-1}).limit(50).lean());
+app.post('/api/blogs/:id/approve',{preHandler:(app as any).auth},async(req:any,reply)=>{const blog=await Blog.findById(req.params.id);if(!blog)return reply.code(404).send({error:'Blog draft not found'});if(blog.status==='published')return reply.code(409).send({error:'Published posts cannot be changed to approved'});blog.status='approved';await blog.save();await Notification.create({type:'content_approved',title:'Blog draft approved',message:blog.title,metadata:{blogId:blog._id}});return {ok:true,id:blog._id,status:blog.status};});
 await connectDb(); await app.listen({port:env.PORT,host:'0.0.0.0'});
