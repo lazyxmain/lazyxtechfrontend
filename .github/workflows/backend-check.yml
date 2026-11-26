@@ -17,3 +17,6 @@ jobs:
           node-version: 22
       - run: npm install --no-audit --no-fund
       - run: npm run build
+      - name: Build dashboard
+        working-directory: apps/dashboard
+        run: npm install --no-audit --no-fund && npm run build
