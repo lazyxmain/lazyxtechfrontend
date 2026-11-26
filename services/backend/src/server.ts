@@ -27,7 +27,7 @@ app.post('/api/competitors',{preHandler:(app as any).auth},async(req:any,reply)=
 });
 app.post('/api/competitors/:id/check',{preHandler:(app as any).auth},async(req:any,reply)=>{
  const item=await Competitor.findById(req.params.id);if(!item)return reply.code(404).send({error:'Competitor not found'});
- try{const result=await crawl(item.url);item.title=result.title;item.description=result.description;item.status=result.status>=200&&result.status<400?'reachable':'issue';item.lastCheckedAt=new Date();item.lastError=undefined;await item.save();return item;}catch(error:any){item.status='error';item.lastCheckedAt=new Date();item.lastError=String(error?.message||error);await item.save();return reply.code(502).send({error:'Competitor check failed.'});}
+ try{const result=await crawl(String(item.url||''));item.title=result.title;item.description=result.description;item.status=result.status>=200&&result.status<400?'reachable':'issue';item.lastCheckedAt=new Date();item.lastError=undefined;await item.save();return item;}catch(error:any){item.status='error';item.lastCheckedAt=new Date();item.lastError=String(error?.message||error);await item.save();return reply.code(502).send({error:'Competitor check failed.'});}
 });
 
 app.get('/api/leads',{preHandler:(app as any).auth},async(req:any)=>{const page=Math.max(1,Number(req.query?.page||1));const limit=Math.min(100,Math.max(1,Number(req.query?.limit||25)));return {items:await Lead.find().sort({createdAt:-1}).skip((page-1)*limit).limit(limit).lean(),page,limit}});
