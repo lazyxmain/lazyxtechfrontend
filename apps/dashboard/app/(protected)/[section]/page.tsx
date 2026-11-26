@@ -139,7 +139,7 @@ function SettingsView({data}:{data:Payload}){
 function BlogView({data,onRefresh}:{data:Payload[],onRefresh:()=>void}){
  const [busy,setBusy]=useState('');
  const approve=async(id:string)=>{setBusy(id);try{await request('/blogs/'+id+'/approve',{method:'POST'});onRefresh();}catch(e:any){alert(e.message||'Could not approve draft');}finally{setBusy('');}};
- return <section className="panel"><div className="panel-heading"><div><h3>Content review queue</h3><p className="muted">Review the article before approval. Approved articles appear automatically on the public website at /blog/{slug}.</p></div><FileSearch/></div>
+ return <section className="panel"><div className="panel-heading"><div><h3>Content review queue</h3><p className="muted">Review the article before approval. Approved articles appear automatically on the public website at /blog/[slug].</p></div><FileSearch/></div>
  {data.length?<div className="blog-list">{data.map((blog:any)=><article className="blog-card" key={blog._id}><div className="blog-card-head"><div><h4>{blog.title}</h4><p className="muted">{blog.excerpt||'No excerpt'} · {blog.createdAt?new Date(blog.createdAt).toLocaleString():''}</p></div><span className={'status-pill '+(blog.status==='approved'?'status-live':'status-pending')}>{blog.status==='approved'?'Published on website':blog.status}</span></div><details><summary>Preview article</summary><pre className="blog-preview">{blog.content||'No content saved.'}</pre></details>{blog.status==='draft'&&<button className="primary" disabled={!!busy} onClick={()=>approve(blog._id)}>{busy===blog._id?'Approving…':'Approve & publish on website'}</button>}</article>)}</div>:<div className="table-empty">No blog drafts yet. Use AI Content to generate your first draft.</div>}
  </section>;
 }
