@@ -11,6 +11,8 @@ import {
   SITE_URL,
 } from '@/lib/site';
 import { SERVICES } from '@/lib/services';
+import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const sans = Inter({
   subsets: ['latin'],
@@ -196,7 +198,7 @@ export default function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
-          {children}
+          {children}\n          <Analytics />\n          <SpeedInsights />
         </ThemeProvider>
       </body>
     </html>
