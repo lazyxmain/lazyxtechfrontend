@@ -1,0 +1,26 @@
+services:
+  backend:
+    build:
+      context: ./services/backend
+      dockerfile: Dockerfile
+    env_file: ./services/backend/.env
+    ports:
+      - "4000:4000"
+    restart: unless-stopped
+  worker:
+    build:
+      context: ./services/backend
+      dockerfile: Dockerfile.worker
+    env_file: ./services/backend/.env
+    restart: unless-stopped
+  dashboard:
+    build:
+      context: ./apps/dashboard
+      dockerfile: Dockerfile
+    environment:
+      NEXT_PUBLIC_API_URL: http://backend:4000
+    ports:
+      - "3001:3001"
+    depends_on:
+      - backend
+    restart: unless-stopped
