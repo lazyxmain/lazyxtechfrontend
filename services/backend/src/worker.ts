@@ -16,4 +16,4 @@ async function runCompetitorReview(){const items=await Competitor.find();if(!ite
 
 await Promise.all(schedules.map(s=>AutomationSchedule.updateOne({key:s.key},{$set:{label:s.label,cron:s.cron,enabled:true}},{upsert:true})));
 await heartbeat();cron.schedule('* * * * *',()=>heartbeat().catch(console.error));cron.schedule('0 2 * * *',()=>execute('technical-seo-daily',technicalAudit));cron.schedule('30 2 * * *',()=>execute('gsc-daily',syncSearchConsole));cron.schedule('0 3 * * 1',()=>execute('competitor-weekly',runCompetitorReview));cron.schedule('0 4 */3 * *',()=>execute('blog-every-3-days',contentReminder));console.log('LazyXTech worker started; scheduled SEO monitoring is active.');
-void (async()=>{const latest:any=await SEOAudit.findOne().sort({createdAt:-1}).lean();if(!latest||Date.now()-new Date(latest.createdAt||latest.completedAt||0).getTime()>24*60*60*1000){await execute('technical-seo-daily',technicalAudit);}})().catch(error=>console.error('[worker] startup audit failed',error));
+void execute('technical-seo-daily',technicalAudit).catch(error=>console.error('[worker] startup audit failed',error));
