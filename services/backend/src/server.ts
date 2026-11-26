@@ -51,7 +51,8 @@ app.get('/api/ai/status',{preHandler:(app as any).auth},async()=>{
 app.get('/api/integrations/status',{preHandler:(app as any).auth},async()=>({integrations:[
  {key:'search-console',name:'Google Search Console',description:'Verified clicks, impressions, CTR, average position and queries.',configured:searchConsoleConfigured()},
  {key:'google-login',name:'Google OAuth login',description:'Owner sign-in using Google OAuth credentials.',configured:Boolean(env.GOOGLE_CLIENT_ID&&env.GOOGLE_CLIENT_SECRET)},
- {key:'gemini',name:'Google Gemini API (free tier)',description:'Optional free-tier AI for SEO blog drafts. Add GEMINI_API_KEY in Render.',configured:Boolean(env.GEMINI_API_KEY)},\n {key:'ollama',name:'Ollama (self-hosted)',description:'Alternative self-hosted model for AI-assisted drafts.',configured:Boolean(env.OLLAMA_BASE_URL&&env.OLLAMA_MODEL)},
+ {key:'gemini',name:'Google Gemini API (free tier)',description:'Optional free-tier AI for SEO blog drafts. Add GEMINI_API_KEY in Render.',configured:Boolean(env.GEMINI_API_KEY)},
+ {key:'ollama',name:'Ollama (self-hosted)',description:'Alternative self-hosted model for AI-assisted drafts.',configured:Boolean(env.OLLAMA_BASE_URL&&env.OLLAMA_MODEL)},
  {key:'pagespeed',name:'Google PageSpeed Insights',description:'Free Lighthouse API key for performance and Core Web Vitals.',configured:Boolean(env.PAGESPEED_API_KEY)},
  {key:'website',name:'Website monitoring target',description:env.SITE_URL,configured:true}
 ]}));
