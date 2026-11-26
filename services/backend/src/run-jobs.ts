@@ -34,11 +34,11 @@ async function main(){
    const latest:any=await SEOAudit.findOne().sort({createdAt:-1}).lean();
    const firstIssue=latest?.issues?.[0];
    const topic=firstIssue?'How to fix '+String(firstIssue.type).replace(/_/g,' ')+' on business websites':'Website development and technical SEO best practices for growing businesses';
-   const response=await fetch(env.OLLAMA_BASE_URL.replace(/\\/$/,'')+'/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:env.OLLAMA_MODEL,stream:false,prompt:'Write an original, practical SEO blog article for LazyXTech about: '+topic+'. Return Markdown with a clear H1, introduction, H2 sections, practical examples, FAQ and conclusion. Do not invent statistics or make unsupported claims.'}),signal:AbortSignal.timeout(180000)});
+   const response=await fetch((env.OLLAMA_BASE_URL.endsWith('/')?env.OLLAMA_BASE_URL.slice(0,-1):env.OLLAMA_BASE_URL)+'/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:env.OLLAMA_MODEL,stream:false,prompt:'Write an original, practical SEO blog article for LazyXTech about: '+topic+'. Return Markdown with a clear H1, introduction, H2 sections, practical examples, FAQ and conclusion. Do not invent statistics or make unsupported claims.'}),signal:AbortSignal.timeout(180000)});
    if(!response.ok)throw new Error('Local Ollama provider is unavailable');
    const generated:any=await response.json();const content=String(generated.response||'').trim();
    if(!content)throw new Error('AI returned an empty draft');
-   const title=content.split('\\n').find((line:string)=>line.startsWith('# '))?.replace(/^#\\s*/,'')||topic;
+   const title=content.split(String.fromCharCode(10)).find((line:string)=>line.startsWith('# '))?.replace(/^# +/,'')||topic;
    const slug=title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,80)+'-'+Date.now().toString().slice(-6);
    const draft=await Blog.create({slug,title,excerpt:'Scheduled AI-assisted draft. Review and fact-check before publishing.',content,status:'draft',seo:{source:'scheduled-ollama',topic}});
    await Notification.create({type:'content_draft',title:'Scheduled blog draft ready for review',message:title,metadata:{blogId:draft._id,slug}});
