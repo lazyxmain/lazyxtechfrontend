@@ -24,8 +24,8 @@ app.get('/api/search-console/summary',{preHandler:(app as any).auth},async(req:a
 app.get('/api/automation/status',{preHandler:(app as any).auth},async()=>{
  const records=await AutomationSchedule.find().sort({key:1}).lean();
  const heartbeat:any=records.find((x:any)=>x.key==='worker-heartbeat');
- const online=Boolean(heartbeat?.lastRunAt&&Date.now()-new Date(heartbeat.lastRunAt).getTime()<3*60*1000);
- return {worker:{status:online?'online':'offline',lastHeartbeat:heartbeat?.lastRunAt||null},schedules:records.filter((x:any)=>x.key!=='worker-heartbeat').map((x:any)=>({key:x.key,label:x.label,cron:x.cron,enabled:x.enabled,lastRunAt:x.lastRunAt,lastStatus:x.lastStatus,lastError:x.lastError}))};
+ const recent=Boolean(heartbeat?.lastRunAt&&Date.now()-new Date(heartbeat.lastRunAt).getTime()<26*60*60*1000);const online=recent&&heartbeat?.lastStatus!=='error';
+ return {worker:{status:online?'online':heartbeat?.lastStatus==='error'?'error':'offline',lastHeartbeat:heartbeat?.lastRunAt||null,lastError:heartbeat?.lastError||null},schedules:records.filter((x:any)=>x.key!=='worker-heartbeat').map((x:any)=>({key:x.key,label:x.label,cron:x.cron,enabled:x.enabled,lastRunAt:x.lastRunAt,lastStatus:x.lastStatus,lastError:x.lastError}))};
 });
 app.get('/api/ai/status',{preHandler:(app as any).auth},async()=>{
  try{const response=await fetch(env.OLLAMA_BASE_URL.replace(/\\/$/,'')+'/api/tags',{signal:AbortSignal.timeout(2500)});if(!response.ok)throw new Error('Ollama unavailable');const body:any=await response.json();const models=(body.models||[]).map((x:any)=>x.name);return {available:true,provider:'Ollama (local)',model:models.includes(env.OLLAMA_MODEL)?env.OLLAMA_MODEL:(models[0]||env.OLLAMA_MODEL),models,message:'Local AI provider is reachable. Blog generation is enabled for drafts.'};}
