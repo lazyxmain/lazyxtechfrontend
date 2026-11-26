@@ -49,6 +49,7 @@ export default function Section({params}:{params:{section:string}}){
       else if(section==='automation') result=await request('/automation/status');
       else if(section==='agents') result=await request('/ai/status');
       else if(section==='notifications') result=await request('/notifications');
+      else if(section==='blog') result=await request('/blogs');
       else if(section==='leads') result=await request('/leads');
       else if(section==='speed') result=await request('/automation/status');
       else if(section==='settings') result=await request('/integrations/status');
@@ -95,6 +96,9 @@ export default function Section({params}:{params:{section:string}}){
     {!loading&&(section==='automation'||section==='speed')&&<AutomationView data={data||{}} speed={section==='speed'}/>}
     {!loading&&section==='agents'&&<AgentsView data={data||{}}/>}
     {!loading&&section==='settings'&&<SettingsView data={data||{}}/>}
+    {!loading&&section==='blog'&&<BlogView data={data||[]} onRefresh={()=>setRefreshKey(v=>v+1)}/>}
+    {!loading&&section==='notifications'&&<NotificationsView data={data||[]}/>}
+    {!loading&&section==='leads'&&<LeadsView data={data||{}}/>}
     {!loading&&section==='content'&&<section className="panel content-generator"><div className="panel-heading"><div><h3>AI-assisted blog draft</h3><p className="muted">Drafts are saved for review. Nothing is published automatically.</p></div><Bot/></div><label className="field-label" htmlFor="blog-topic">Blog topic</label><input id="blog-topic" className="text-input" value={topic} onChange={e=>setTopic(e.target.value)} placeholder="e.g. How to choose a website development partner"/><button className="primary" onClick={()=>runAction('draft')} disabled={running||!topic.trim()}>{running?'Generating…':'Generate draft'}</button><p className="muted small">Requires a reachable Ollama instance and a configured model. No paid AI API is required.</p></section>}
     {!loading&&!['seo','audit','automation','speed','agents','settings','content'].includes(section)&&<GenericView section={section} data={data||{}}/>}
   </div>;
@@ -127,6 +131,24 @@ function AgentsView({data}:{data:Payload}){
 function SettingsView({data}:{data:Payload}){
  const integrations=data.integrations||[];
  return <section className="panel"><div className="panel-heading"><div><h3>Connected services</h3><p className="muted">Credentials stay on the backend; never paste secrets into the dashboard.</p></div><Database/></div><div className="schedule-list">{integrations.map((item:any)=><div className="schedule-row" key={item.key}><div><b>{item.name}</b><small>{item.description}</small></div><span className={'status-pill '+(item.configured?'status-live':'status-pending')}>{item.configured?'Configured':'Needs setup'}</span></div>)}</div></section>;
+}
+function BlogView({data,onRefresh}:{data:Payload[],onRefresh:()=>void}){
+ const [busy,setBusy]=useState('');
+ const approve=async(id:string)=>{setBusy(id);try{await request('/blogs/'+id+'/approve',{method:'POST'});onRefresh();}catch(e:any){alert(e.message||'Could not approve draft');}finally{setBusy('');}};
+ return <section className="panel"><div className="panel-heading"><div><h3>Content review queue</h3><p className="muted">AI-generated content stays in draft until you review and approve it.</p></div><FileSearch/></div>
+ {data.length?<div className="schedule-list">{data.map((blog:any)=><div className="schedule-row" key={blog._id}><div><b>{blog.title}</b><small>{blog.status} · {new Date(blog.createdAt).toLocaleString()}</small></div><div className="page-actions"><span className={'status-pill '+(blog.status==='approved'?'status-live':'status-pending')}>{blog.status}</span>{blog.status==='draft'&&<button className="primary" disabled={!!busy} onClick={()=>approve(blog._id)}>{busy===blog._id?'Approving…':'Approve draft'}</button>}</div></div>)}</div>:<div className="table-empty">No blog drafts yet. Use AI Content to generate your first draft.</div>}
+ </section>;
+}
+function NotificationsView({data}:{data:Payload[]}){
+ return <section className="panel"><div className="panel-heading"><div><h3>Recent system activity</h3><p className="muted">SEO audits, worker errors and content review alerts</p></div><Activity/></div>
+ {data.length?<div className="schedule-list">{data.map((item:any)=><div className="schedule-row" key={item._id}><div><b>{item.title||item.type}</b><small>{item.message} · {new Date(item.createdAt).toLocaleString()}</small></div><span className="status-pill status-pending">{item.type}</span></div>)}</div>:<div className="table-empty">No notifications yet.</div>}
+ </section>;
+}
+function LeadsView({data}:{data:Payload}){
+ const items=data.items||[];
+ return <section className="panel"><div className="panel-heading"><div><h3>Website enquiries</h3><p className="muted">Latest leads submitted through your website</p></div><Activity/></div>
+ {items.length?<div className="schedule-list">{items.map((lead:any)=><div className="schedule-row" key={lead._id}><div><b>{lead.name||'Website visitor'} · {lead.service||'General enquiry'}</b><small>{lead.email||'No email'} · {lead.message||''}</small></div><span className="status-pill status-pending">{lead.status||'new'}</span></div>)}</div>:<div className="table-empty">No leads received yet.</div>}
+ </section>;
 }
 function GenericView({section,data}:{section:string,data:Payload}){
  const messages:Record<string,string>={keywords:'Keyword tracking will become active after Search Console data and target keywords are configured.',competitors:'Add competitor domains before monitoring can start.',blog:'Blog drafts and publishing approvals will be managed here.',leads:'Lead records will appear here when your website form submits to the backend.',notifications:'System and automation alerts will appear here.',reports:'Reports are generated from completed SEO audits and connected analytics.'};
