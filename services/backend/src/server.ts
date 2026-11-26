@@ -70,5 +70,6 @@ app.post('/api/ai/blog-draft',{preHandler:(app as any).auth},async(req:any,reply
 app.get('/api/blogs',{preHandler:(app as any).auth},async()=>Blog.find().sort({createdAt:-1}).limit(50).lean());
 app.post('/api/blogs/:id/approve',{preHandler:(app as any).auth},async(req:any,reply)=>{const blog=await Blog.findById(req.params.id);if(!blog)return reply.code(404).send({error:'Blog draft not found'});if(blog.status==='published')return reply.code(409).send({error:'Published posts cannot be changed to approved'});blog.status='approved';await blog.save();await Notification.create({type:'content_approved',title:'Blog draft approved',message:blog.title,metadata:{blogId:blog._id}});return {ok:true,id:blog._id,status:blog.status};});
 await connectDb();
+if(env.ENABLE_INLINE_WORKER){await import('./worker.js');app.log.info('Inline SEO worker enabled.');}
 const configuredWebsite=await Website.findOne({active:true});if(!configuredWebsite)await Website.create({url:env.SITE_URL,name:'LazyXTech',active:true});
 await app.listen({port:env.PORT,host:'0.0.0.0'});
