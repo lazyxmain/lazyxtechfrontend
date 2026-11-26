@@ -8,6 +8,8 @@ permissions:
 jobs:
   daily-monitoring:
     runs-on: ubuntu-latest
+    env:
+      MONGODB_URI: ${{ secrets.MONGODB_URI }}
     timeout-minutes: 20
     steps:
       - name: Checkout repository
@@ -23,7 +25,6 @@ jobs:
         working-directory: services/backend
         env:
           NODE_ENV: production
-          MONGODB_URI: ${{ secrets.MONGODB_URI }}
           JWT_SECRET: scheduled-jobs-only-secret-not-used-for-http-auth-123456
           CORS_ORIGIN: https://lazyxtechdashboard.vercel.app
           SITE_URL: https://lazyxtech.com
@@ -31,4 +32,5 @@ jobs:
           GSC_PROPERTY_URL: ${{ secrets.GSC_PROPERTY_URL }}
           OLLAMA_BASE_URL: ${{ secrets.OLLAMA_BASE_URL }}
           OLLAMA_MODEL: ${{ secrets.OLLAMA_MODEL }}
+        if: env.MONGODB_URI != ''
         run: npm run jobs:run
