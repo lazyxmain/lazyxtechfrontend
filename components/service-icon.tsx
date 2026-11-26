@@ -1,4 +1,11 @@
-import { Globe, LayoutTemplate, Search, ShoppingBag, Smartphone } from 'lucide-react';
+import {
+  Globe,
+  Layers,
+  LayoutTemplate,
+  Search,
+  ShoppingBag,
+  Smartphone,
+} from 'lucide-react';
 import type { ServiceIcon } from '@/lib/services';
 
 const map = {
@@ -7,6 +14,7 @@ const map = {
   shopping: ShoppingBag,
   mobile: Smartphone,
   search: Search,
+  layers: Layers,
 } as const;
 
 export function ServiceIconView({

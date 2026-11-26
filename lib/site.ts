@@ -68,7 +68,7 @@ export function buildMailto(opts?: {
 export const FAQS = [
   {
     q: 'What services does LazyXTech offer?',
-    a: 'We build custom websites with Next.js and React, WordPress and Shopify websites and stores, sites on platforms like Wix and Framer, SEO optimization and audits, and cross-platform mobile apps with React Native and Expo. Every development project includes 6 months of support after launch.',
+    a: 'We build custom websites with Next.js and React, WordPress and Shopify websites and stores, sites on platforms like Wix, Framer and Lovable, SEO optimization and audits, and cross-platform mobile apps with React Native and Expo. Every development project includes 6 months of support after launch.',
   },
   {
     q: 'Where is LazyXTech located?',

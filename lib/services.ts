@@ -1,4 +1,10 @@
-export type ServiceIcon = 'globe' | 'wordpress' | 'shopping' | 'mobile' | 'search';
+export type ServiceIcon =
+  | 'globe'
+  | 'wordpress'
+  | 'shopping'
+  | 'mobile'
+  | 'search'
+  | 'layers';
 
 export interface ServiceFaq {
   q: string;
@@ -22,11 +28,18 @@ export interface Service {
   features: { title: string; desc: string }[];
   tech: string[];
   faqs: ServiceFaq[];
+  /** shown as a card on the home page */
+  card?: boolean;
+  /** related deep-dive pages (slugs) */
+  related?: string[];
+  /** replaces the default "6 months support" callout */
+  callout?: { title: string; text: string };
 }
 
 export const SERVICES: Service[] = [
   {
     slug: 'custom-website-development',
+    card: true,
     n: '01',
     icon: 'globe',
     title: 'Custom Website Development',
@@ -91,7 +104,7 @@ export const SERVICES: Service[] = [
   },
   {
     slug: 'wordpress-development',
-    n: '02',
+    n: '',
     icon: 'wordpress',
     title: 'WordPress Development',
     short:
@@ -155,7 +168,7 @@ export const SERVICES: Service[] = [
   },
   {
     slug: 'shopify-development',
-    n: '03',
+    n: '',
     icon: 'shopping',
     title: 'Shopify Development',
     short:
@@ -214,71 +227,6 @@ export const SERVICES: Service[] = [
       {
         q: 'Is support included after launch?',
         a: 'Yes, you get 6 months of post-launch support for fixes, small changes and questions.',
-      },
-    ],
-  },
-  {
-    slug: 'seo-services',
-    n: '04',
-    icon: 'search',
-    title: 'SEO Optimization & Web Ranking',
-    short:
-      'SEO audits, technical and on-page optimisation and ranking-focused improvements that help customers find you on Google.',
-    metaTitle: 'SEO Services in Bhopal: SEO Audit, Optimization & Web Ranking',
-    metaDescription:
-      'SEO company in Bhopal. SEO audits, technical and on-page optimization, local SEO and website ranking improvements to help your business get found on Google.',
-    keywords: [
-      'SEO services in Bhopal',
-      'SEO company in Bhopal',
-      'SEO audit Bhopal',
-      'local SEO Bhopal',
-      'website ranking services India',
-      'technical SEO optimization',
-    ],
-    h1: 'SEO Optimization & Web Ranking in Bhopal',
-    intro:
-      'A good website is only useful if people can find it. We audit your site, fix what is holding it back and optimise it step by step, so search engines understand your pages and the right customers reach you.',
-    points: [
-      'Complete SEO audit with a clear action plan',
-      'Technical and on-page SEO optimisation',
-      'Local SEO and Google Business Profile setup',
-      'Speed and Core Web Vitals improvements',
-    ],
-    features: [
-      {
-        title: 'SEO audit',
-        desc: 'We review your site for technical errors, speed, mobile usability, indexing, content and keywords, then give you a prioritised list of fixes.',
-      },
-      {
-        title: 'Technical and on-page SEO',
-        desc: 'Titles, meta descriptions, headings, internal links, sitemap, structured data and clean site structure, so search engines can read and rank your pages.',
-      },
-      {
-        title: 'Local SEO',
-        desc: 'Google Business Profile, local keywords and consistent business details, to help you show up when people nearby search for your service.',
-      },
-      {
-        title: 'Speed and ranking improvements',
-        desc: 'Faster loading pages, better Core Web Vitals and content improvements based on what your customers actually search for.',
-      },
-    ],
-    tech: ['Google Search Console', 'Google Analytics', 'PageSpeed Insights', 'Schema markup', 'Keyword research'],
-    faqs: [
-      {
-        q: 'Can you guarantee a number one ranking on Google?',
-        a: 'No one can honestly guarantee a specific ranking, because search engines decide it. What we do is fix technical problems, improve content and structure and build a strong foundation, which gives your site the best chance to rank.',
-      },
-      {
-        q: 'What is included in an SEO audit?',
-        a: 'We check technical health, speed, mobile usability, indexing, on-page elements, keywords and content gaps, and then share a clear, prioritised action plan.',
-      },
-      {
-        q: 'How long does SEO take to show results?',
-        a: 'SEO is gradual. Technical fixes can show improvements in a few weeks, while ranking growth for competitive keywords usually takes a few months of consistent work.',
-      },
-      {
-        q: 'Can you do SEO for a site you did not build?',
-        a: 'Yes. We can audit and optimise existing websites on WordPress, Shopify, Wix, Next.js and other platforms.',
       },
     ],
   },
@@ -350,7 +298,160 @@ export const SERVICES: Service[] = [
       },
     ],
   },
+  {
+    slug: 'platform-development',
+    card: true,
+    n: '02',
+    icon: 'layers',
+    title: 'WordPress, Shopify & Platform Development',
+    short:
+      'Get online fast on the right platform: WordPress, Shopify, Wix, Framer, Lovable and more, set up properly and easy for you to manage.',
+    metaTitle: 'WordPress, Shopify, Wix & Framer Development in Bhopal',
+    metaDescription:
+      'Website development on WordPress, Shopify, Wix, Framer, Lovable and other platforms in Bhopal. We pick the right platform, build it properly and support it for 6 months.',
+    keywords: [
+      'WordPress developer Bhopal',
+      'Shopify developer Bhopal',
+      'Wix website developer India',
+      'Framer website developer',
+      'Lovable website development',
+      'no-code website development',
+    ],
+    h1: 'WordPress, Shopify, Wix, Framer & Platform Development in Bhopal',
+    intro:
+      'Not every business needs a fully custom build. We help you launch quickly on the platform that fits your goals and budget: WordPress for content sites, Shopify for online stores, Framer and Wix for design-led marketing sites, and Lovable and other modern builders for fast MVPs. Then we set it up properly, not just install a theme.',
+    points: [
+      'WordPress and WooCommerce websites',
+      'Shopify store setup and customisation',
+      'Wix and Framer websites',
+      'Lovable and other no-code / AI builder projects',
+    ],
+    features: [
+      {
+        title: 'The right platform for the job',
+        desc: 'We recommend a platform based on your goals, budget and how you want to manage the site, rather than pushing one tool for everything.',
+      },
+      {
+        title: 'Set up properly',
+        desc: 'Clean structure, speed optimisation, mobile layouts, SEO basics, analytics and security, so the site works well and not just looks good.',
+      },
+      {
+        title: 'Easy for you to manage',
+        desc: 'Update pages, products and content yourself. We hand over with simple guidance and stay available for 6 months after launch.',
+      },
+      {
+        title: 'Redesign, migrate or rescue',
+        desc: 'Already on a platform and unhappy? We can redesign it, move you to a better one, or clean up and productionise something built quickly with a tool like Lovable.',
+      },
+    ],
+    tech: ['WordPress', 'WooCommerce', 'Shopify', 'Wix', 'Framer', 'Lovable'],
+    related: ['wordpress-development', 'shopify-development'],
+    faqs: [
+      {
+        q: 'Which platform should I choose: WordPress, Shopify, Wix or Framer?',
+        a: 'WordPress suits content-heavy sites and blogs, Shopify is best for online stores, Framer is great for polished marketing sites, and Wix works for simple small-business sites. Tell us your goals and we will recommend the best fit.',
+      },
+      {
+        q: 'Can you work with Lovable or other AI site builders?',
+        a: 'Yes. If you have started a project in a tool like Lovable, we can review it, fix issues, improve design and performance, connect your domain and make it production-ready.',
+      },
+      {
+        q: 'Can you move my website from one platform to another?',
+        a: 'Yes. We can migrate content and design to a better-suited platform while keeping your pages and SEO as intact as possible.',
+      },
+      {
+        q: 'Is support included after launch?',
+        a: 'Yes, every development project includes 6 months of post-launch support.',
+      },
+    ],
+  },
+  {
+    slug: 'seo-optimization',
+    card: true,
+    n: '03',
+    icon: 'search',
+    title: 'SEO Optimization & Web Ranking',
+    short:
+      'Get found on Google. SEO audits, technical fixes and on-page optimisation that help the right customers discover your business.',
+    metaTitle: 'SEO Services & Website Ranking in Bhopal',
+    metaDescription:
+      'SEO company in Bhopal offering SEO audits, technical SEO, on-page optimisation, local SEO and ranking improvement to help your website get found on Google.',
+    keywords: [
+      'SEO services in Bhopal',
+      'SEO company Bhopal',
+      'website ranking Bhopal',
+      'SEO audit India',
+      'local SEO Bhopal',
+      'technical SEO services',
+    ],
+    h1: 'SEO Optimization & Web Ranking in Bhopal',
+    intro:
+      'A good website only works if people can find it. We help businesses improve their visibility on Google with a clear SEO audit, technical fixes, on-page optimisation and local SEO, with honest reporting on what is changing and why.',
+    points: [
+      'Complete SEO audit with a clear action list',
+      'Technical SEO and Core Web Vitals',
+      'On-page and keyword optimisation',
+      'Local SEO and Google Business Profile',
+      'Ranking and traffic reporting',
+    ],
+    features: [
+      {
+        title: 'SEO audit',
+        desc: 'A detailed review of crawl issues, speed, mobile usability, content gaps and competitors, with a prioritised list of what to fix first.',
+      },
+      {
+        title: 'Technical SEO',
+        desc: 'Site speed, Core Web Vitals, indexing, sitemaps, structured data and clean URLs, so search engines can crawl and understand your site.',
+      },
+      {
+        title: 'On-page optimisation',
+        desc: 'Keyword research plus better titles, descriptions, headings and content, aimed at the searches your customers actually make.',
+      },
+      {
+        title: 'Local SEO and ranking growth',
+        desc: 'Google Business Profile, local listings and regular tracking, so customers in Bhopal or any target city can find you.',
+      },
+    ],
+    tech: [
+      'Google Search Console',
+      'Google Analytics 4',
+      'PageSpeed Insights',
+      'Schema markup',
+      'Keyword research',
+    ],
+    callout: {
+      title: 'Honest, measurable SEO',
+      text: 'We explain what we change and why, and report on real data from Search Console and Analytics. No one can honestly guarantee a number-one ranking, so we focus on the work that moves the needle.',
+    },
+    faqs: [
+      {
+        q: 'How long does SEO take to show results?',
+        a: 'Technical fixes can show an effect within weeks, but meaningful ranking growth usually takes 3 to 6 months depending on competition and your starting point.',
+      },
+      {
+        q: 'Can you guarantee a number-one ranking on Google?',
+        a: 'No. Nobody can honestly guarantee that. We focus on proven work: technical health, relevant content, strong on-page SEO and local visibility, and we show you the data.',
+      },
+      {
+        q: 'Do you do SEO for websites you did not build?',
+        a: 'Yes. We can audit and optimise any website, whether it is on WordPress, Shopify, Wix, Next.js or another platform.',
+      },
+      {
+        q: 'What do I receive from an SEO audit?',
+        a: 'A clear report covering technical issues, speed, on-page problems and competitor gaps, along with a prioritised list of fixes and recommendations.',
+      },
+    ],
+  },
 ];
+
+export const CARD_SERVICES = [
+  'custom-website-development',
+  'platform-development',
+  'seo-optimization',
+  'app-development',
+]
+  .map((slug) => SERVICES.find((x) => x.slug === slug))
+  .filter((x): x is Service => Boolean(x));
 
 export function getService(slug: string) {
   return SERVICES.find((s) => s.slug === slug);

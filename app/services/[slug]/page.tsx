@@ -7,7 +7,7 @@ import { Footer } from '@/components/sections/footer';
 import { Reveal, SmokeText } from '@/components/reveal';
 import { SectionTag } from '@/components/section-heading';
 import { ServiceIconView } from '@/components/service-icon';
-import { SERVICES, getService } from '@/lib/services';
+import { CARD_SERVICES, SERVICES, getService } from '@/lib/services';
 import {
   COMPANY,
   LOCATION_LABEL,
@@ -62,7 +62,10 @@ export default function ServicePage({ params }: Props) {
   if (!s) notFound();
 
   const url = `${SITE_URL}/services/${s.slug}`;
-  const others = SERVICES.filter((o) => o.slug !== s.slug);
+  const others = CARD_SERVICES.filter((o) => o.slug !== s.slug);
+  const related = (s.related ?? [])
+    .map((slug) => getService(slug))
+    .filter((x): x is NonNullable<typeof x> => Boolean(x));
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -176,7 +179,9 @@ export default function ServicePage({ params }: Props) {
                   ))}
                   <li className="flex items-start gap-3 text-sm">
                     <ShieldCheck size={16} aria-hidden="true" className="mt-0.5 shrink-0 text-foreground" />
-                    <span className="font-medium">{COMPANY.supportMonths} months of post-launch support</span>
+                    <span className="font-medium">
+                      {s.callout ? s.callout.title : `${COMPANY.supportMonths} months of post-launch support`}
+                    </span>
                   </li>
                 </ul>
                 <p className="mt-5 border-t border-border pt-4 text-xs text-foreground-muted">
@@ -237,16 +242,47 @@ export default function ServicePage({ params }: Props) {
             </div>
             <div className="rounded-2xl border border-border bg-foreground p-6 text-background sm:p-8">
               <h2 className="font-display text-xl font-semibold tracking-tight">
-                {COMPANY.supportMonths} months of support after launch
+                {s.callout ? s.callout.title : `${COMPANY.supportMonths} months of support after launch`}
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-background/70 sm:text-base">
-                Bug fixes, compatibility and security updates, small content or design
-                changes, and direct help by phone, WhatsApp or email for six months
-                after your project goes live.
+                {s.callout
+                  ? s.callout.text
+                  : 'Bug fixes, compatibility and security updates, small content or design changes, and direct help by phone, WhatsApp or email for six months after your project goes live.'}
               </p>
             </div>
           </div>
         </section>
+
+        {related.length > 0 && (
+          <section aria-labelledby="related-title" className="py-6 sm:py-10">
+            <div className="mx-auto max-w-[1400px] px-5 md:px-8">
+              <h2 id="related-title" className="font-display text-xl font-semibold tracking-tight sm:text-2xl">
+                Platform guides
+              </h2>
+              <ul className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {related.map((r) => (
+                  <li key={r.slug}>
+                    <Link
+                      href={`/services/${r.slug}`}
+                      title={`${r.title} in Bhopal`}
+                      className="group flex h-full items-center justify-between gap-3 rounded-2xl border border-border bg-surface p-5 transition-colors hover:border-foreground/30"
+                    >
+                      <span>
+                        <span className="block font-display font-semibold tracking-tight">
+                          {r.title}
+                        </span>
+                        <span className="mt-1 block text-sm text-foreground-muted">
+                          {r.short}
+                        </span>
+                      </span>
+                      <ArrowUpRight size={18} aria-hidden="true" className="shrink-0" />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
+        )}
 
         {/* FAQ */}
         <section aria-labelledby="faq-title" className="py-14 sm:py-20 md:py-24">
@@ -285,7 +321,7 @@ export default function ServicePage({ params }: Props) {
             <h2 id="more-title" className="font-display text-xl font-semibold tracking-tight sm:text-2xl">
               Other services
             </h2>
-            <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {others.map((o) => (
                 <li key={o.slug}>
                   <Link
