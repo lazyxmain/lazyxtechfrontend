@@ -4,8 +4,9 @@ import {useRouter} from 'next/navigation';
 import {ShieldCheck,LockKeyhole,Mail} from 'lucide-react';
 
 const API='/api';
+const OWNER_EMAIL='lazyxcustomer@gmail.com';
 export default function Login(){
- const router=useRouter(); const [loading,setLoading]=useState(false); const [email,setEmail]=useState(''); const [password,setPassword]=useState(''); const [error,setError]=useState('');
+ const router=useRouter(); const [loading,setLoading]=useState(false); const [email,setEmail]=useState(OWNER_EMAIL); const [password,setPassword]=useState(''); const [error,setError]=useState('');
  useEffect(()=>{let active=true;fetch(API+'/me',{credentials:'include',cache:'no-store'}).then(r=>{if(active&&r.ok)router.replace('/')}).catch(()=>{});return()=>{active=false}},[router]);
  const submit=async(e:FormEvent)=>{e.preventDefault();setLoading(true);setError('');try{const r=await fetch(API+'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({email,password})});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'Login failed');const session=await fetch(API+'/me',{credentials:'include',cache:'no-store'});if(!session.ok)throw new Error(session.status===401?'Login was accepted but the session cookie was not received. Please retry; if this repeats, the server cookie configuration needs attention.':'Login succeeded, but the session check is temporarily unavailable. Please retry.');router.replace('/');router.refresh()}catch(e:any){setError(e.message||'Unable to sign in')}finally{setLoading(false)}};
  return <main className="login-wrap"><section className="login-card">
