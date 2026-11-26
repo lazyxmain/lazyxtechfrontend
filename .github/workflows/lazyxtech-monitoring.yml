@@ -1,0 +1,36 @@
+name: LazyXTech SEO monitoring
+on:
+  schedule:
+    - cron: "30 2 * * *"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  daily-monitoring:
+    runs-on: ubuntu-latest
+    env:
+      MONGODB_URI: ${{ secrets.MONGODB_URI }}
+    timeout-minutes: 20
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install backend dependencies
+        working-directory: services/backend
+        run: npm install --no-audit --no-fund
+      - name: Run SEO monitoring and AI draft workflow
+        working-directory: services/backend
+        env:
+          NODE_ENV: production
+          JWT_SECRET: scheduled-jobs-only-secret-not-used-for-http-auth-123456
+          CORS_ORIGIN: https://lazyxtechdashboard.vercel.app
+          SITE_URL: https://lazyxtech.com
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          GSC_PROPERTY_URL: ${{ secrets.GSC_PROPERTY_URL }}
+          OLLAMA_BASE_URL: ${{ secrets.OLLAMA_BASE_URL }}
+          OLLAMA_MODEL: ${{ secrets.OLLAMA_MODEL }}
+        if: env.MONGODB_URI != ''
+        run: npm run jobs:run

@@ -3,12 +3,12 @@ import {useEffect,useState,FormEvent} from 'react';
 import {useRouter} from 'next/navigation';
 import {ShieldCheck,Chrome,LockKeyhole,Mail} from 'lucide-react';
 
-const API=process.env.NEXT_PUBLIC_API_URL||'http://localhost:4000';
+const API='/api';
 export default function Login(){
  const router=useRouter(); const [loading,setLoading]=useState(false); const [googleLoading,setGoogleLoading]=useState(false); const [email,setEmail]=useState(''); const [password,setPassword]=useState(''); const [error,setError]=useState('');
- useEffect(()=>{fetch(API+'/api/me',{credentials:'include'}).then(r=>{if(r.ok)router.replace('/')}).catch(()=>{})},[router]);
- const submit=async(e:FormEvent)=>{e.preventDefault();setLoading(true);setError('');try{const r=await fetch(API+'/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({email,password})});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'Login failed');router.replace('/');router.refresh()}catch(e:any){setError(e.message||'Unable to sign in')}finally{setLoading(false)}};
- const google=()=>{setGoogleLoading(true);window.location.href=API+'/api/auth/google/start'};
+ useEffect(()=>{fetch(API+'/me',{credentials:'include'}).then(r=>{if(r.ok)router.replace('/')}).catch(()=>{})},[router]);
+ const submit=async(e:FormEvent)=>{e.preventDefault();setLoading(true);setError('');try{const r=await fetch(API+'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({email,password})});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'Login failed');router.replace('/');router.refresh()}catch(e:any){setError(e.message||'Unable to sign in')}finally{setLoading(false)}};
+ const google=()=>{setGoogleLoading(true);window.location.href=API+'/auth/google/start'};
  return <main className="login-wrap"><section className="login-card">
   <div className="brand">LazyX<span>Tech</span></div><div className="login-icon"><ShieldCheck/></div>
   <h1>Welcome back</h1><p className="muted">Sign in to your private LazyXTech command center.</p>
