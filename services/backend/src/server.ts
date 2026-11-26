@@ -1,6 +1,7 @@
 import Fastify from 'fastify'; import cors from '@fastify/cors'; import cookie from '@fastify/cookie'; import jwt from '@fastify/jwt'; import {scryptSync,timingSafeEqual} from 'node:crypto'; import {env} from './config.js'; import {connectDb} from './db.js'; import {User,Lead,Notification,Website,SEOAudit} from './models.js'; import {crawl} from './seo.js'; import {googleAuthUrl,verifyGoogleCode} from './google.js'; import {getSearchConsoleSummary,searchConsoleConfigured} from './search-console.js'; import {Blog,AutomationSchedule} from './models.js';
 const app=Fastify({logger:true});
 await app.register(cors,{origin:env.CORS_ORIGIN,credentials:true}); await app.register(cookie); await app.register(jwt,{secret:env.JWT_SECRET,cookie:{cookieName:'lx_session',signed:false}});
+app.get('/',async()=>({ok:true,service:'LazyXTech API',health:'/health'}));
 app.get('/health',async()=>({ok:true,service:'lazyxtech-backend',time:new Date().toISOString()}));
 app.decorate('auth',async function(req:any,reply:any){try{await req.jwtVerify()}catch{return reply.code(401).send({error:'Unauthorized'})}});
 
@@ -35,7 +36,8 @@ app.get('/api/integrations/status',{preHandler:(app as any).auth},async()=>({int
  {key:'search-console',name:'Google Search Console',description:'Verified clicks, impressions, CTR, average position and queries.',configured:searchConsoleConfigured()},
  {key:'google-login',name:'Google OAuth login',description:'Owner sign-in using Google OAuth credentials.',configured:Boolean(env.GOOGLE_CLIENT_ID&&env.GOOGLE_CLIENT_SECRET)},
  {key:'ollama',name:'Local AI (Ollama)',description:'Local model for AI-assisted content drafts.',configured:Boolean(env.OLLAMA_BASE_URL&&env.OLLAMA_MODEL)},
- {key:'pagespeed',name:'Google PageSpeed Insights',description:'Live Lighthouse and Core Web Vitals checks.',configured:true}
+ {key:'pagespeed',name:'Google PageSpeed Insights',description:'Live Lighthouse and Core Web Vitals checks.',configured:true},
+ {key:'website',name:'Website monitoring target',description:env.SITE_URL,configured:true}
 ]}));
 app.post('/api/ai/blog-draft',{preHandler:(app as any).auth},async(req:any,reply)=>{
  const topic=String(req.body?.topic||'').trim().slice(0,180);if(!topic)return reply.code(400).send({error:'A blog topic is required.'});
@@ -52,4 +54,6 @@ app.post('/api/ai/blog-draft',{preHandler:(app as any).auth},async(req:any,reply
 });
 app.get('/api/blogs',{preHandler:(app as any).auth},async()=>Blog.find().sort({createdAt:-1}).limit(50).lean());
 app.post('/api/blogs/:id/approve',{preHandler:(app as any).auth},async(req:any,reply)=>{const blog=await Blog.findById(req.params.id);if(!blog)return reply.code(404).send({error:'Blog draft not found'});if(blog.status==='published')return reply.code(409).send({error:'Published posts cannot be changed to approved'});blog.status='approved';await blog.save();await Notification.create({type:'content_approved',title:'Blog draft approved',message:blog.title,metadata:{blogId:blog._id}});return {ok:true,id:blog._id,status:blog.status};});
-await connectDb(); await app.listen({port:env.PORT,host:'0.0.0.0'});
+await connectDb();
+const configuredWebsite=await Website.findOne({active:true});if(!configuredWebsite)await Website.create({url:env.SITE_URL,name:'LazyXTech',active:true});
+await app.listen({port:env.PORT,host:'0.0.0.0'});
