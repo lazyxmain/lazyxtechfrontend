@@ -51,10 +51,12 @@ export default function Section({params}:{params:{section:string}}){
       else if(section==='notifications') result=await request('/notifications');
       else if(section==='blog') result=await request('/blogs');
       else if(section==='leads') result=await request('/leads');
-      else if(section==='speed') result=await request('/automation/status');
+      else if(section==='speed') result=await request('/pagespeed');
       else if(section==='settings') result=await request('/integrations/status');
-      else result=await request('/overview');
-      setData(result);setUpdated(new Date().toLocaleTimeString());
+      else if(section==='competitors') result=await request('/competitors');
+      else if(section==='reports') {const [audit,gsc,automation]=await Promise.all([request('/audits/latest'),request('/search-console/summary?days=28'),request('/automation/status')]);result={audit,gsc,automation};}
+      else result=await request('/notifications');
+      setData(result);setUpdated(new Date().toLocaleTimeString('en-IN',{timeZone:'Asia/Kolkata'}));
     }catch(e:any){setError(e.message||'Could not load this module');}
     finally{setLoading(false);}
   },[section,range]);
@@ -88,19 +90,21 @@ export default function Section({params}:{params:{section:string}}){
 
     {error&&<div className="notice notice-error"><AlertCircle size={17}/>{error}</div>}
     {notice&&<div className="notice notice-success"><CheckCircle2 size={17}/>{notice}</div>}
-    <div className="module-meta"><span><span className="live-dot"/> Backend connected</span><span>Updated {updated||'—'}</span></div>
+    <div className="module-meta"><span><span className="live-dot"/> Live backend data</span><span>Updated {updated||'—'}</span></div>
 
     {loading?<div className="panel loading-panel">Loading verified module data…</div>:null}
-    {!loading&&section==='seo'&&<SEOView data={data||{}} range={range} onRange={setRange} onRefresh={()=>setRefreshKey(v=>v+1)}/>}
+    {!loading&&(section==='seo'||section==='keywords')&&<SEOView data={data||{}} range={range} onRange={setRange} onRefresh={()=>setRefreshKey(v=>v+1)}/>}
     {!loading&&section==='audit'&&<AuditView data={data||{}}/>}
     {!loading&&(section==='automation'||section==='speed')&&<AutomationView data={data||{}} speed={section==='speed'}/>}
     {!loading&&section==='agents'&&<AgentsView data={data||{}}/>}
     {!loading&&section==='settings'&&<SettingsView data={data||{}}/>}
+    {!loading&&section==='competitors'&&<CompetitorsView data={data||{}} onRefresh={()=>setRefreshKey(v=>v+1)}/>}
+    {!loading&&section==='reports'&&<ReportsView data={data||{}}/>}
     {!loading&&section==='blog'&&<BlogView data={data||[]} onRefresh={()=>setRefreshKey(v=>v+1)}/>}
     {!loading&&section==='notifications'&&<NotificationsView data={data||[]}/>}
     {!loading&&section==='leads'&&<LeadsView data={data||{}}/>}
-    {!loading&&section==='content'&&<section className="panel content-generator"><div className="panel-heading"><div><h3>AI-assisted blog draft</h3><p className="muted">Drafts are saved for review. Nothing is published automatically.</p></div><Bot/></div><label className="field-label" htmlFor="blog-topic">Blog topic</label><input id="blog-topic" className="text-input" value={topic} onChange={e=>setTopic(e.target.value)} placeholder="e.g. How to choose a website development partner"/><button className="primary" onClick={()=>runAction('draft')} disabled={running||!topic.trim()}>{running?'Generating…':'Generate draft'}</button><p className="muted small">Requires a reachable Ollama instance and a configured model. No paid AI API is required.</p></section>}
-    {!loading&&!['seo','audit','automation','speed','agents','settings','content'].includes(section)&&<GenericView section={section} data={data||{}}/>}
+    {!loading&&section==='content'&&<section className="panel content-generator"><div className="panel-heading"><div><h3>AI-assisted blog draft</h3><p className="muted">Drafts are saved for review. Nothing is published automatically.</p></div><Bot/></div><label className="field-label" htmlFor="blog-topic">Blog topic</label><input id="blog-topic" className="text-input" value={topic} onChange={e=>setTopic(e.target.value)} placeholder="e.g. How to choose a website development partner"/><button className="primary" onClick={()=>runAction('draft')} disabled={running||!topic.trim()}>{running?'Generating…':'Generate draft'}</button><p className="muted small">Requires a reachable Ollama instance and a configured model. No paid AI API is required.</p><button className="secondary" onClick={()=>location.assign('/blog')}>Open blog review queue</button></section>}
+    {!loading&&!['seo','keywords','audit','automation','speed','agents','settings','content','competitors','reports','blog','notifications','leads'].includes(section)&&<GenericView section={section} data={data||{}}/>}
   </div>;
 }
 
