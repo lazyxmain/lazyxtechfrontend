@@ -1,4 +1,4 @@
-import Fastify from 'fastify'; import cors from '@fastify/cors'; import cookie from '@fastify/cookie'; import jwt from '@fastify/jwt'; import {scryptSync,timingSafeEqual} from 'node:crypto'; import {env} from './config.js'; import {connectDb} from './db.js'; import {User,Lead,Notification,Website,SEOAudit} from './models.js'; import {crawl} from './seo.js'; import {googleAuthUrl,verifyGoogleCode} from './google.js';
+import Fastify from 'fastify'; import cors from '@fastify/cors'; import cookie from '@fastify/cookie'; import jwt from '@fastify/jwt'; import {scryptSync,timingSafeEqual} from 'node:crypto'; import {env} from './config.js'; import {connectDb} from './db.js'; import {User,Lead,Notification,Website,SEOAudit} from './models.js'; import {crawl} from './seo.js'; import {googleAuthUrl,verifyGoogleCode} from './google.js'; import {getSearchConsoleSummary,searchConsoleConfigured} from './search-console.js'; import {Blog,AutomationSchedule} from './models.js';
 const app=Fastify({logger:true});
 await app.register(cors,{origin:env.CORS_ORIGIN,credentials:true}); await app.register(cookie); await app.register(jwt,{secret:env.JWT_SECRET,cookie:{cookieName:'lx_session',signed:false}});
 app.get('/health',async()=>({ok:true,service:'lazyxtech-backend',time:new Date().toISOString()}));
@@ -16,4 +16,39 @@ app.post('/api/audits/run',{preHandler:(app as any).auth},async(req:any,reply)=>
 app.post('/api/leads',{config:{rateLimit:{max:20,timeWindow:'1 minute'}} as any},async(req:any)=>Lead.create(req.body));
 app.get('/api/leads',{preHandler:(app as any).auth},async(req:any)=>{const page=Math.max(1,Number(req.query?.page||1));const limit=Math.min(100,Math.max(1,Number(req.query?.limit||25)));return {items:await Lead.find().sort({createdAt:-1}).skip((page-1)*limit).limit(limit).lean(),page,limit}});
 app.get('/api/notifications',{preHandler:(app as any).auth},async()=>Notification.find().sort({createdAt:-1}).limit(100).lean());
+
+app.get('/api/search-console/summary',{preHandler:(app as any).auth},async(req:any,reply)=>{
+ try{const days=Math.max(1,Math.min(90,Number(req.query?.days||28)));return await getSearchConsoleSummary(days);}
+ catch(error:any){app.log.error(error);return reply.code(502).send({error:'Google Search Console could not be queried. Check the service-account access and property URL.',details:String(error?.message||'Unknown Google API error').slice(0,240)});}
+});
+app.get('/api/automation/status',{preHandler:(app as any).auth},async()=>{
+ const records=await AutomationSchedule.find().sort({key:1}).lean();
+ const heartbeat:any=records.find((x:any)=>x.key==='worker-heartbeat');
+ const online=Boolean(heartbeat?.lastRunAt&&Date.now()-new Date(heartbeat.lastRunAt).getTime()<3*60*1000);
+ return {worker:{status:online?'online':'offline',lastHeartbeat:heartbeat?.lastRunAt||null},schedules:records.filter((x:any)=>x.key!=='worker-heartbeat').map((x:any)=>({key:x.key,label:x.label,cron:x.cron,enabled:x.enabled,lastRunAt:x.lastRunAt,lastStatus:x.lastStatus,lastError:x.lastError}))};
+});
+app.get('/api/ai/status',{preHandler:(app as any).auth},async()=>{
+ try{const response=await fetch(env.OLLAMA_BASE_URL.replace(/\\/$/,'')+'/api/tags',{signal:AbortSignal.timeout(2500)});if(!response.ok)throw new Error('Ollama unavailable');const body:any=await response.json();const models=(body.models||[]).map((x:any)=>x.name);return {available:true,provider:'Ollama (local)',model:models.includes(env.OLLAMA_MODEL)?env.OLLAMA_MODEL:(models[0]||env.OLLAMA_MODEL),models,message:'Local AI provider is reachable. Blog generation is enabled for drafts.'};}
+ catch{return {available:false,provider:'Ollama (local)',model:env.OLLAMA_MODEL,message:'Start Ollama and pull the configured model to enable AI draft generation. No paid API key is required.'};}
+});
+app.get('/api/integrations/status',{preHandler:(app as any).auth},async()=>({integrations:[
+ {key:'search-console',name:'Google Search Console',description:'Verified clicks, impressions, CTR, average position and queries.',configured:searchConsoleConfigured()},
+ {key:'google-login',name:'Google OAuth login',description:'Owner sign-in using Google OAuth credentials.',configured:Boolean(env.GOOGLE_CLIENT_ID&&env.GOOGLE_CLIENT_SECRET)},
+ {key:'ollama',name:'Local AI (Ollama)',description:'Local model for AI-assisted content drafts.',configured:Boolean(env.OLLAMA_BASE_URL&&env.OLLAMA_MODEL)},
+ {key:'pagespeed',name:'Google PageSpeed Insights',description:'Live Lighthouse and Core Web Vitals checks.',configured:true}
+]}));
+app.post('/api/ai/blog-draft',{preHandler:(app as any).auth},async(req:any,reply)=>{
+ const topic=String(req.body?.topic||'').trim().slice(0,180);if(!topic)return reply.code(400).send({error:'A blog topic is required.'});
+ try{
+  const response=await fetch(env.OLLAMA_BASE_URL.replace(/\\/$/,'')+'/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:env.OLLAMA_MODEL,stream:false,prompt:'Write an original, helpful SEO blog article for LazyXTech about: '+topic+'. Return clear Markdown with an H1 title, introduction, descriptive H2 sections, practical advice, FAQ and conclusion. Avoid fabricated statistics and keyword stuffing.'}),signal:AbortSignal.timeout(180000)});
+  if(!response.ok)throw new Error('Ollama generation failed. Confirm the model is downloaded and the local AI service is running.');
+  const generated:any=await response.json();const content=String(generated.response||'').trim();if(!content)throw new Error('The AI model returned an empty draft.');
+  const title=content.split('\\n').find((line:string)=>line.startsWith('# '))?.replace(/^#\\s*/,'')||topic;
+  const slug=title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,90)+'-'+Date.now().toString().slice(-6);
+  const draft=await Blog.create({slug,title,excerpt:'AI-assisted draft. Review and fact-check before publishing.',content,status:'draft',seo:{source:'ollama',topic}});
+  await Notification.create({type:'content_draft',title:'Blog draft ready for review',message:title,metadata:{blogId:draft._id,slug}});
+  return reply.code(201).send({ok:true,id:draft._id,title:draft.title,slug:draft.slug,status:draft.status});
+ }catch(error:any){app.log.error(error);return reply.code(503).send({error:String(error?.message||'AI draft generation is unavailable').slice(0,300)});}
+});
+app.get('/api/blogs',{preHandler:(app as any).auth},async()=>Blog.find().sort({createdAt:-1}).limit(50).lean());
 await connectDb(); await app.listen({port:env.PORT,host:'0.0.0.0'});
