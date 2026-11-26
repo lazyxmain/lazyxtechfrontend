@@ -34,3 +34,17 @@ Or use Docker Compose after creating services/backend/.env.
 ## Existing deployment
 
 Do not delete the current live Render setup yet. First validate this branch locally and then switch deployment deliberately. MongoDB Atlas can remain external.
+
+## Scheduled monitoring (GitHub Actions)
+
+The repository includes `.github/workflows/lazyxtech-monitoring.yml`. After merging it to `main`, GitHub Actions runs the monitoring job daily at 02:30 UTC and supports manual runs from the Actions tab.
+
+Configure these repository Actions secrets before enabling the workflow:
+
+- `MONGODB_URI` — the same MongoDB Atlas connection string used by the Render API.
+- `GOOGLE_SERVICE_ACCOUNT_JSON` — optional service-account JSON. Add its email as a user on the verified Search Console property.
+- `OLLAMA_BASE_URL` — optional reachable Ollama endpoint. GitHub-hosted runners cannot access Ollama on your personal computer via localhost; use a reachable private-network tunnel or hosted Ollama endpoint if scheduled AI drafts are desired.
+
+`GSC_PROPERTY_URL` defaults to `https://lazyxtech.com/`. Change the workflow environment if your Search Console property uses a domain property or a different canonical host.
+
+The job performs a bounded same-origin crawl (up to 20 pages), records a technical audit and notifications, checks Search Console when credentials are present, and creates AI blog drafts only when Ollama is reachable. Drafts are never published automatically.
