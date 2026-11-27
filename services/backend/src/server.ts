@@ -33,7 +33,7 @@ app.get('/api/notifications',{preHandler:(app as any).auth},async()=>Notificatio
 
 app.get('/api/search-console/summary',{preHandler:(app as any).auth},async(req:any,reply)=>{
  try{const days=Math.max(1,Math.min(90,Number(req.query?.days||28)));return await getSearchConsoleSummary(days);}
- catch(error:any){app.log.error(error);return reply.code(502).send({error:'Google Search Console could not be queried. Check the service-account access and property URL.',details:String(error?.message||'Unknown Google API error').slice(0,240)});}
+ catch(error:any){app.log.error(error);return {connected:false,property:env.GSC_PROPERTY_URL,metrics:{clicks:null,impressions:null,ctr:null,position:null},queries:[],pages:[],message:'Google Search Console is configured, but its API is currently unavailable. Enable the Search Console API in the connected Google Cloud project, then retry.'};}
 });
 app.get('/api/automation/status',{preHandler:(app as any).auth},async()=>{
  const records=await AutomationSchedule.find().sort({key:1}).lean();
