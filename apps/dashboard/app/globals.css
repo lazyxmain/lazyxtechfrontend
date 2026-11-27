@@ -196,3 +196,20 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
  .two-col{grid-template-columns:1fr}
 }
 @media(max-width:460px){.overview-stats{grid-template-columns:1fr}.page-head{gap:12px}.page-actions{width:100%;justify-content:flex-end}.top-status>span{font-size:9px}}
+
+/* Leads table */
+.leads-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:4px 0 16px}
+.leads-count{display:flex;align-items:baseline;gap:7px;color:var(--lx-muted);font-size:11px}.leads-count strong{font-size:22px;color:var(--lx-text);font-weight:600}
+.leads-search{display:flex;align-items:center;gap:8px;width:min(340px,100%);height:38px;padding:0 11px;border:1px solid var(--lx-border);border-radius:8px;color:var(--lx-muted)}
+.leads-search input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:var(--lx-text);font-size:12px}
+.leads-table-wrap{width:100%;overflow:auto;border:1px solid var(--lx-border);border-radius:9px}
+.leads-table{width:100%;min-width:980px;border-collapse:collapse;text-align:left;font-size:11px}
+.leads-table th{padding:12px;background:var(--lx-bg);color:var(--lx-muted);font-size:10px;font-weight:600;white-space:nowrap}
+.leads-table td{max-width:230px;padding:13px 12px;border-top:1px solid var(--lx-border);vertical-align:top;color:var(--lx-text)}
+.leads-table td:first-child{min-width:180px}.leads-table td:first-child strong,.leads-table td:first-child a{display:flex;align-items:center;gap:6px}.leads-table td:first-child strong{margin-bottom:5px;font-size:12px}.leads-table td:first-child a{margin-top:4px;color:var(--lx-muted);font-size:10px}
+.lead-message{min-width:190px;max-width:260px;white-space:normal;overflow-wrap:anywhere;line-height:1.5}
+.leads-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;color:var(--lx-muted);font-size:10px}
+.leads-footer>div{display:flex;gap:7px}.leads-footer .secondary{display:flex;align-items:center;gap:4px}
+.leads-loading{padding:8px 0;color:var(--lx-muted);font-size:11px}
+.dark .leads-search{background:#141b23}.dark .leads-table th{background:#1a222c}
+@media(max-width:600px){.leads-toolbar{align-items:stretch;flex-direction:column}.leads-search{width:100%}.leads-footer{align-items:flex-start;flex-direction:column}}
