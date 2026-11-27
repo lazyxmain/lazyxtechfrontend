@@ -1,5 +1,3 @@
-'use client';
-
 import { SectionHeading } from '@/components/section-heading';
 import { Reveal } from '@/components/reveal';
 
