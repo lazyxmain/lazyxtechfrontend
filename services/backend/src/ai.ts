@@ -3,7 +3,7 @@ import {env} from './config.js';
 const promptFor=(topic:string)=>'Write an original, accurate, genuinely useful SEO article for LazyXTech about: '+topic+'. Return Markdown with one H1 title, a concise introduction, useful H2 sections, actionable examples, an FAQ with 3 to 5 questions, and a conclusion. Use natural language and related terms; never keyword-stuff, invent statistics, invent citations, or claim rankings are guaranteed. Target Indian business owners when relevant.';
 
 export async function generateArticle(topic:string){
- if(env.GEMINI_API_KEY){
+ if(false && env.GEMINI_API_KEY){
   const url='https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(env.GEMINI_MODEL)+':generateContent?key='+encodeURIComponent(env.GEMINI_API_KEY);
   const response=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{role:'user',parts:[{text:'You are an expert SEO content writer. Write helpful, fact-checked content and never fabricate facts or sources.\\n\\n'+promptFor(topic)}]}],generationConfig:{temperature:0.65,maxOutputTokens:6000}}),signal:AbortSignal.timeout(180000)});
   const result:any=await response.json().catch(()=>({}));
