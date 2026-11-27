@@ -1,7 +1,5 @@
-name: LazyXTech SEO monitoring
+name: LazyXTech manual SEO maintenance
 on:
-  schedule:
-    - cron: "30 2 * * *"
   workflow_dispatch:
 permissions:
   contents: read
@@ -21,7 +19,7 @@ jobs:
       - name: Install backend dependencies
         working-directory: services/backend
         run: npm install --no-audit --no-fund
-      - name: Run SEO monitoring and AI draft workflow
+      - name: Run SEO monitoring and AI draft workflow manually
         working-directory: services/backend
         env:
           NODE_ENV: production
