@@ -1,9 +1,11 @@
 'use client';
 
 import {useCallback,useEffect,useState} from 'react';
+import dynamic from 'next/dynamic';
 import {Activity,AlertCircle,ArrowUpRight,CheckCircle2,Clock3,ExternalLink,FileSearch,Gauge,RefreshCw,Search,ShieldCheck,Zap,Bot,Database} from 'lucide-react';
 
 type Payload = Record<string, any>;
+const LeadsView = dynamic(() => import('./leads-view'), { loading: () => <div className="panel loading-panel">Loading leads…</div> });
 const descriptions:Record<string,[string,string]> = {
   seo:['SEO performance','Verified organic search performance from Google Search Console.'],
   keywords:['Keyword tracking','Monitor search queries and ranking opportunities.'],
@@ -143,12 +145,6 @@ function BlogView({data,onRefresh}:{data:Payload[],onRefresh:()=>void}){
 function NotificationsView({data}:{data:Payload[]}){
  return <section className="panel"><div className="panel-heading"><div><h3>Recent system activity</h3><p className="muted">SEO audits, worker errors and content review alerts</p></div><Activity/></div>
  {data.length?<div className="schedule-list">{data.map((item:any)=><div className="schedule-row" key={item._id}><div><b>{item.title||item.type}</b><small>{item.message} · {new Date(item.createdAt).toLocaleString()}</small></div><span className="status-pill status-pending">{item.type}</span></div>)}</div>:<div className="table-empty">No notifications yet.</div>}
- </section>;
-}
-function LeadsView({data}:{data:Payload}){
- const items=data.items||[];
- return <section className="panel"><div className="panel-heading"><div><h3>Website enquiries</h3><p className="muted">Latest leads submitted through your website</p></div><Activity/></div>
- {items.length?<div className="schedule-list">{items.map((lead:any)=><div className="schedule-row" key={lead._id}><div><b>{lead.name||'Website visitor'} · {lead.service||'General enquiry'}</b><small>{lead.email||'No email'} · {lead.message||''}</small></div><span className="status-pill status-pending">{lead.status||'new'}</span></div>)}</div>:<div className="table-empty">No leads received yet.</div>}
  </section>;
 }
 function GenericView({section,data}:{section:string,data:Payload}){
