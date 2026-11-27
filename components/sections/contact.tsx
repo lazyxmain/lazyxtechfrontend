@@ -75,19 +75,17 @@ export function Contact() {
       return;
     }
 
-    let insertError: { message: string } | null = null;
     try {
-      // Loaded on demand so the Supabase SDK never blocks first paint.
-      const { getSupabase } = await import('@/lib/supabase');
-      const sb = getSupabase();
-      const { error } = await sb.from('project_inquiries').insert(payload);
-      insertError = error;
-    } catch (err) {
-      insertError = err as { message: string };
-    }
-    if (insertError) {
+      const response=await fetch('/api/contact',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Accept':'application/json'},
+        body:JSON.stringify(payload),
+      });
+      const result=await response.json().catch(()=>({}));
+      if(!response.ok)throw new Error(result.error||'Unable to send your inquiry right now.');
+    } catch(err:any) {
       setStatus('error');
-      setErrorMsg('Something went wrong. Please try again, or call or email us directly.');
+      setErrorMsg(err?.message||'Something went wrong. Please try again, or call or email us directly.');
       return;
     }
     setStatus('success');
