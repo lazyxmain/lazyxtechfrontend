@@ -42,13 +42,33 @@ app.get('/api/automation/status',{preHandler:(app as any).auth},async()=>{
  const schedules=records.filter((x:any)=>x.key!=='worker-heartbeat').map((x:any)=>({key:x.key,label:x.label,cron:x.cron,enabled:x.enabled,lastStartedAt:x.lastStartedAt,lastRunAt:x.lastRunAt,lastStatus:x.lastStatus,lastError:x.lastError}));const currentTask=schedules.find((x:any)=>x.lastStatus==='running')||null;const nextOccurrence=(expression:string)=>{const [minute,hour,dayOfMonth,,dayOfWeek]=expression.split(' ');const now=new Date();const candidate=new Date(now);candidate.setUTCHours(Number(hour),Number(minute),0,0);if(dayOfWeek==='1'){let delta=(8-candidate.getUTCDay())%7;if(delta===0||candidate<=now)delta=delta||7;candidate.setUTCDate(candidate.getUTCDate()+delta);}else if(dayOfMonth==='*'){if(candidate<=now)candidate.setUTCDate(candidate.getUTCDate()+1);}else if(dayOfMonth.startsWith('*/')){const step=Number(dayOfMonth.slice(2));let day=candidate.getUTCDate();let delta=(step-((day-1)%step))%step;candidate.setUTCDate(day+delta);if(candidate<=now)candidate.setUTCDate(candidate.getUTCDate()+step);if(candidate.getUTCMonth()!==now.getUTCMonth()){candidate.setUTCMonth(now.getUTCMonth()+1);candidate.setUTCDate(1);}}return candidate;};const nextTask=schedules.filter((x:any)=>x.enabled!==false).map((x:any)=>({...x,nextRunAt:nextOccurrence(x.cron)})).sort((a:any,b:any)=>a.nextRunAt.getTime()-b.nextRunAt.getTime())[0]||null;return {worker:{status:online?'online':heartbeat?.lastStatus==='error'?'error':'offline',lastHeartbeat:heartbeat?.lastRunAt||null,lastError:heartbeat?.lastError||null},currentTask,nextTask,schedules};
 });
 app.get('/api/ai/status',{preHandler:(app as any).auth},async()=>{
- if(env.GROQ_API_KEY){try{const r=await fetch('https://api.groq.com/openai/v1/models',{headers:{Authorization:'Bearer '+env.GROQ_API_KEY},signal:AbortSignal.timeout(5000)});if(r.ok)return {available:true,provider:'Groq API (free tier)',model:env.GROQ_MODEL,message:'Groq API key is accepted. AI drafts are available within your model rate limits.'};return {available:false,provider:'Groq API',model:env.GROQ_MODEL,message:'Groq API key is configured but the API rejected it. Check the key, model access and free-tier limits.'};}catch{return {available:false,provider:'Groq API',model:env.GROQ_MODEL,message:'Groq API could not be reached from the backend.'};}}
- try{const response=await fetch((env.OLLAMA_BASE_URL.endsWith('/')?env.OLLAMA_BASE_URL.slice(0,-1):env.OLLAMA_BASE_URL)+'/api/tags',{signal:AbortSignal.timeout(2500)});if(!response.ok)throw new Error('Ollama unavailable');const body:any=await response.json();const models=(body.models||[]).map((x:any)=>x.name);return {available:true,provider:'Ollama (self-hosted)',model:models.includes(env.OLLAMA_MODEL)?env.OLLAMA_MODEL:(models[0]||env.OLLAMA_MODEL),models,message:'Self-hosted AI provider is reachable.'};}
- catch{return {available:false,provider:'No AI provider connected',model:env.OLLAMA_MODEL,message:'Add a Groq API key as GROQ_API_KEY in Render, or connect a reachable Ollama server.'};}
+ if(env.GEMINI_API_KEY){
+  try{
+   const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(env.GEMINI_MODEL)+'?key='+encodeURIComponent(env.GEMINI_API_KEY),{signal:AbortSignal.timeout(5000)});
+   if(r.ok)return {available:true,provider:'Google Gemini API (free tier)',model:env.GEMINI_MODEL,message:'Gemini API key is accepted. AI drafts are available within your model limits.'};
+   const j:any=await r.json().catch(()=>({}));
+   return {available:false,provider:'Google Gemini API',model:env.GEMINI_MODEL,message:j.error?.message||'Gemini API key is configured but the API rejected it.'};
+  }catch{return {available:false,provider:'Google Gemini API',model:env.GEMINI_MODEL,message:'Gemini API could not be reached from the backend.'};}
+ }
+ if(env.GROQ_API_KEY){
+  try{
+   const r=await fetch('https://api.groq.com/openai/v1/models',{headers:{Authorization:'Bearer '+env.GROQ_API_KEY},signal:AbortSignal.timeout(5000)});
+   if(r.ok)return {available:true,provider:'Groq API (free tier)',model:env.GROQ_MODEL,message:'Groq API key is accepted. AI drafts are available within your model rate limits.'};
+   return {available:false,provider:'Groq API',model:env.GROQ_MODEL,message:'Groq API key is configured but the API rejected it. Check the key, model access and free-tier limits.'};
+  }catch{return {available:false,provider:'Groq API',model:env.GROQ_MODEL,message:'Groq API could not be reached from the backend.'};}
+ }
+ try{
+  const response=await fetch((env.OLLAMA_BASE_URL.endsWith('/')?env.OLLAMA_BASE_URL.slice(0,-1):env.OLLAMA_BASE_URL)+'/api/tags',{signal:AbortSignal.timeout(2500)});
+  if(!response.ok)throw new Error('Ollama unavailable');
+  const body:any=await response.json();
+  const models=(body.models||[]).map((x:any)=>x.name);
+  return {available:true,provider:'Ollama (self-hosted)',model:models.includes(env.OLLAMA_MODEL)?env.OLLAMA_MODEL:(models[0]||env.OLLAMA_MODEL),models,message:'Self-hosted AI provider is reachable.'};
+ }catch{return {available:false,provider:'No AI provider connected',model:env.OLLAMA_MODEL,message:'Add GEMINI_API_KEY in Render, or connect a reachable Ollama server.'};}
 });
 app.get('/api/integrations/status',{preHandler:(app as any).auth},async()=>({integrations:[
  {key:'search-console',name:'Google Search Console',description:'Verified clicks, impressions, CTR, average position and queries.',configured:searchConsoleConfigured()},
- {key:'groq',name:'Groq API (free tier)',description:'Hosted AI for SEO blog drafts. Add GROQ_API_KEY in Render. Free usage has model-specific rate limits.',configured:Boolean(env.GROQ_API_KEY)},
+ {key:'gemini',name:'Google Gemini API (free tier)',description:'Hosted AI for SEO blog drafts. Add GEMINI_API_KEY in Render. Free usage has model-specific limits.',configured:Boolean(env.GEMINI_API_KEY)},
+ {key:'groq',name:'Groq API (free tier)',description:'Fallback hosted AI for SEO blog drafts. Add GROQ_API_KEY in Render if Gemini is unavailable.',configured:Boolean(env.GROQ_API_KEY)},
  {key:'ollama',name:'Ollama (self-hosted)',description:'Alternative self-hosted model for AI-assisted drafts.',configured:Boolean(env.OLLAMA_BASE_URL&&env.OLLAMA_MODEL)},
  {key:'pagespeed',name:'Google PageSpeed Insights',description:'Free Lighthouse API key for performance and Core Web Vitals.',configured:Boolean(env.PAGESPEED_API_KEY)},
  {key:'website',name:'Website monitoring target',description:env.SITE_URL,configured:true}
