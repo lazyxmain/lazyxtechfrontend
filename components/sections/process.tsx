@@ -1,5 +1,3 @@
-'use client';
-
 import { Search, Map, Code, Rocket, LifeBuoy } from 'lucide-react';
 import { SectionHeading } from '@/components/section-heading';
 import { Reveal } from '@/components/reveal';
