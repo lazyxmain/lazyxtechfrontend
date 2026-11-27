@@ -48,6 +48,7 @@ export function Contact() {
       service: get('project_type') || undefined,
       name: get('name'),
       company: get('company'),
+      phone: get('phone'),
       budget: get('budget'),
       details: get('description'),
     });
@@ -64,6 +65,7 @@ export function Contact() {
       name: String(data.get('name') || '').trim(),
       email: String(data.get('email') || '').trim(),
       company: String(data.get('company') || '').trim() || null,
+      phone: String(data.get('phone') || '').trim() || null,
       project_type: String(data.get('project_type') || '').trim(),
       budget: String(data.get('budget') || '').trim() || null,
       description: String(data.get('description') || '').trim(),
@@ -185,6 +187,9 @@ export function Contact() {
                     placeholder="you@example.com" autoComplete="email"
                     className="input-base"
                   />
+                </Field>
+                <Field label="Phone / WhatsApp">
+                  <input name="phone" type="tel" placeholder="+91 98765 43210" autoComplete="tel" className="input-base" />
                 </Field>
                 <Field label="Business / Company">
                   <input
