@@ -1,5 +1,3 @@
-'use client';
-
 import { Bug, ShieldCheck, PencilLine, Gauge, PhoneCall, ArrowUpRight } from 'lucide-react';
 import { SectionHeading } from '@/components/section-heading';
 import { Reveal } from '@/components/reveal';
