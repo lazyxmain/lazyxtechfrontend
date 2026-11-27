@@ -59,7 +59,8 @@ export default function Section({params}:{params:{section:string}}){
     finally{setLoading(false);}
   },[section,range]);
 
-  useEffect(()=>{load();},[load,refreshKey]);
+  useEffect(()=>{if(section==='speed'){location.replace('/');return;}load();},[load,refreshKey,section]);
+  if(section==='speed') return null;
 
   const runAction=async(kind:'audit'|'draft')=>{
     setRunning(true);setError('');setNotice('');
