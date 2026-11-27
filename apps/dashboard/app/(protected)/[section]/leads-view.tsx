@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Activity, ChevronLeft, ChevronRight, Mail, Phone, Search } from 'lucide-react';
 
 type Lead = {
@@ -11,7 +11,23 @@ type Lead = {
 export default function LeadsView({ data }: { data: { items?: Lead[]; total?: number; page?: number; pages?: number } }) {
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(data.page || 1);
-  const items = data.items || [];
+  const [current, setCurrent] = useState(data);
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    if (page === (data.page || 1)) return;
+    let active = true;
+    setLoading(true);
+    fetch('/api/leads?page=' + page + '&limit=25', { credentials: 'include' })
+      .then(async (response) => {
+        const body = await response.json();
+        if (!response.ok) throw new Error(body.error || 'Unable to load leads');
+        if (active) setCurrent(body);
+      })
+      .catch(() => { if (active) setPage(current.page || 1); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [page, data.page]);
+  const items = current.items || [];
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return items;
@@ -24,10 +40,10 @@ export default function LeadsView({ data }: { data: { items?: Lead[]; total?: nu
       <Activity />
     </div>
     <div className="leads-toolbar">
-      <div className="leads-count"><strong>{data.total ?? items.length}</strong><span>total enquiries</span></div>
+      <div className="leads-count"><strong>{current.total ?? items.length}</strong><span>total enquiries</span></div>
       <label className="leads-search"><Search size={15}/><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search name, email, service…" aria-label="Search leads"/></label>
     </div>
-    {filtered.length ? <div className="leads-table-wrap"><table className="leads-table">
+    {loading && <div className="leads-loading">Loading page…</div>}{filtered.length ? <div className="leads-table-wrap"><table className="leads-table">
       <thead><tr><th>Contact</th><th>Company</th><th>Service</th><th>Budget</th><th>Project details</th><th>Received</th><th>Status</th></tr></thead>
       <tbody>{filtered.map((lead) => <tr key={lead._id}>
         <td><strong>{lead.name || 'Website visitor'}</strong><a href={lead.email ? 'mailto:' + lead.email : undefined}><Mail size={12}/>{lead.email || 'No email'}</a>{lead.phone && <a href={'tel:' + lead.phone}><Phone size={12}/>{lead.phone}</a>}</td>
@@ -39,6 +55,6 @@ export default function LeadsView({ data }: { data: { items?: Lead[]; total?: nu
         <td><span className={'status-pill ' + ((lead.status || 'new') === 'new' ? 'status-pending' : 'status-live')}>{lead.status || 'new'}</span></td>
       </tr>)}</tbody>
     </table></div> : <div className="table-empty">{query ? 'No enquiries match your search.' : 'No leads received yet. Website contact form submissions will appear here.'}</div>}
-    <div className="leads-footer"><span>Showing {filtered.length} of {data.total ?? items.length} enquiries · Page {page} of {data.pages || 1}</span><div><button className="secondary" disabled={page <= 1} onClick={() => setPage((v) => Math.max(1, v - 1))}><ChevronLeft size={14}/> Previous</button><button className="secondary" disabled={page >= (data.pages || 1)} onClick={() => setPage((v) => Math.min(data.pages || 1, v + 1))}><ChevronRight size={14}/> Next</button></div></div>
+    <div className="leads-footer"><span>Showing {filtered.length} of {data.total ?? items.length} enquiries · Page {page} of {current.pages || 1}</span><div><button className="secondary" disabled={page <= 1} onClick={() => setPage((v) => Math.max(1, v - 1))}><ChevronLeft size={14}/> Previous</button><button className="secondary" disabled={page >= (data.pages || 1)} onClick={() => setPage((v) => Math.min(data.pages || 1, v + 1))}><ChevronRight size={14}/> Next</button></div></div>
   </section>;
 }
