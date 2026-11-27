@@ -1,5 +1,3 @@
-'use client';
-
 import { type ReactNode } from 'react';
 import { Reveal, SmokeText } from '@/components/reveal';
 import { cn } from '@/lib/utils';
