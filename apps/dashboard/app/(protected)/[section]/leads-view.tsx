@@ -55,6 +55,6 @@ export default function LeadsView({ data }: { data: { items?: Lead[]; total?: nu
         <td><span className={'status-pill ' + ((lead.status || 'new') === 'new' ? 'status-pending' : 'status-live')}>{lead.status || 'new'}</span></td>
       </tr>)}</tbody>
     </table></div> : <div className="table-empty">{query ? 'No enquiries match your search.' : 'No leads received yet. Website contact form submissions will appear here.'}</div>}
-    <div className="leads-footer"><span>Showing {filtered.length} of {data.total ?? items.length} enquiries · Page {page} of {current.pages || 1}</span><div><button className="secondary" disabled={page <= 1} onClick={() => setPage((v) => Math.max(1, v - 1))}><ChevronLeft size={14}/> Previous</button><button className="secondary" disabled={page >= (data.pages || 1)} onClick={() => setPage((v) => Math.min(data.pages || 1, v + 1))}><ChevronRight size={14}/> Next</button></div></div>
+    <div className="leads-footer"><span>Showing {filtered.length} of {current.total ?? items.length} enquiries · Page {page} of {current.pages || 1}</span><div><button className="secondary" disabled={page <= 1} onClick={() => setPage((v) => Math.max(1, v - 1))}><ChevronLeft size={14}/> Previous</button><button className="secondary" disabled={page >= (current.pages || 1)} onClick={() => setPage((v) => Math.min(current.pages || 1, v + 1))}><ChevronRight size={14}/> Next</button></div></div>
   </section>;
 }
