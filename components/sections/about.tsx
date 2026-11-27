@@ -1,5 +1,3 @@
-'use client';
-
 import { SectionTag } from '@/components/section-heading';
 import { Reveal, SmokeText } from '@/components/reveal';
 
