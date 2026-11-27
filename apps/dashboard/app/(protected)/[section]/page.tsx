@@ -133,7 +133,7 @@ function AgentsView({data}:{data:Payload}){
  return <div className="panel agent-card"><div className="agent-icon"><Bot size={24}/></div><div><span className={'status-pill '+(data.available?'status-live':'status-pending')}>{data.available?'AI provider online':'AI provider unavailable'}</span><h3>{data.provider||'Local Ollama'}</h3><p className="muted">{data.message||'AI provider health has not been checked.'}</p><small>Model: {data.model||'Not configured'}</small></div></div>;
 }
 function SettingsView({data}:{data:Payload}){
- const integrations=data.integrations||[];
+ const integrations=(data.integrations||[]).filter((item:any)=>item.key!=='google-login'&&item.key!=='google-oauth');
  return <section className="panel"><div className="panel-heading"><div><h3>Connected services</h3><p className="muted">Credentials stay on the backend; never paste secrets into the dashboard.</p></div><Database/></div><div className="schedule-list">{integrations.map((item:any)=><div className="schedule-row" key={item.key}><div><b>{item.name}</b><small>{item.description}</small></div><span className={'status-pill '+(item.configured?'status-live':'status-pending')}>{item.configured?'Configured':'Needs setup'}</span></div>)}</div></section>;
 }
 function BlogView({data,onRefresh}:{data:Payload[],onRefresh:()=>void}){

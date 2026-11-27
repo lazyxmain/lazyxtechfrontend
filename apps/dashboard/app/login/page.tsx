@@ -15,7 +15,7 @@ export default function Login(){
   <form onSubmit={submit} className="login-form">
    <label className="login-label">Email address</label><div className="login-input-wrap"><Mail size={17}/><input type="email" autoComplete="username" placeholder="Owner email" value={email} onChange={e=>setEmail(e.target.value)} required/></div>
    <label className="login-label">Password</label><div className="login-input-wrap"><LockKeyhole size={17}/><input type="password" autoComplete="current-password" placeholder="Enter your password" value={password} onChange={e=>setPassword(e.target.value)} required/></div>
-   <button className="google-btn login-submit" type="submit" disabled={loading}>{loading?'Signing in…':'Sign in with email & password'}</button>
+   <button className="login-submit" type="submit" disabled={loading}>{loading?'Signing in…':'Sign in with email & password'}</button>
   </form>
   <div className="login-note">Owner-only access · Authorized email: <strong>lazyxcustomer@gmail.com</strong></div>
   {error&&<div className="error" role="alert">{error}</div>}
