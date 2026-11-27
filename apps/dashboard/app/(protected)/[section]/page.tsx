@@ -8,7 +8,6 @@ const descriptions:Record<string,[string,string]> = {
   seo:['SEO performance','Verified organic search performance from Google Search Console.'],
   keywords:['Keyword tracking','Monitor search queries and ranking opportunities.'],
   audit:['Technical SEO audit','Crawl your website and track technical SEO issues.'],
-  speed:['Website performance','Core Web Vitals and Lighthouse performance checks.'],
   competitors:['Competitor monitoring','Competitor tracking will appear when targets are configured.'],
   content:['AI content studio','Create SEO-focused drafts with the configured AI provider.'],
   blog:['Blog manager','Review, edit and approve content before publishing.'],
@@ -51,7 +50,6 @@ export default function Section({params}:{params:{section:string}}){
       else if(section==='notifications') result=await request('/notifications');
       else if(section==='blog') result=await request('/blogs');
       else if(section==='leads') result=await request('/leads');
-      else if(section==='speed') result=await request('/pagespeed');
       else if(section==='settings') result=await request('/integrations/status');
       else if(section==='competitors') result=await request('/competitors');
       else if(section==='reports') {const [audit,gsc,automation]=await Promise.all([request('/audits/latest'),request('/search-console/summary?days=28'),request('/automation/status')]);result={audit,gsc,automation};}
@@ -63,17 +61,16 @@ export default function Section({params}:{params:{section:string}}){
 
   useEffect(()=>{load();},[load,refreshKey]);
 
-  const runAction=async(kind:'audit'|'speed'|'draft')=>{
+  const runAction=async(kind:'audit'|'draft')=>{
     setRunning(true);setError('');setNotice('');
     try{
       if(kind==='audit'){await request('/audits/run',{method:'POST'});setNotice('Technical SEO audit completed.');}
-      if(kind==='speed'){const result=await request('/pagespeed');setData(result);setNotice('PageSpeed check completed.');}
       if(kind==='draft'){
         if(!topic.trim()) throw new Error('Enter a blog topic first.');
         await request('/ai/blog-draft',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({topic})});
         setTopic('');setNotice('Draft created. Review it in Blog Manager before publishing.');
       }
-      if(kind!=='speed') setRefreshKey(v=>v+1);
+      setRefreshKey(v=>v+1);
     }catch(e:any){setError(e.message||'Action failed');}
     finally{setRunning(false);}
   };
@@ -83,7 +80,6 @@ export default function Section({params}:{params:{section:string}}){
       <div><p className="eyebrow">LAZYXTECH / MODULE</p><h2>{title}</h2><p className="muted">{description}</p></div>
       <div className="page-actions">
         {section==='audit'&&<button className="primary" onClick={()=>runAction('audit')} disabled={running}><RefreshCw size={15}/>{running?'Running audit…':'Run audit'}</button>}
-        {section==='speed'&&<button className="primary" onClick={()=>runAction('speed')} disabled={running}><Gauge size={15}/>{running?'Testing…':'Run PageSpeed'}</button>}
         <button className="icon-btn" onClick={()=>setRefreshKey(v=>v+1)} aria-label="Refresh module"><RefreshCw size={16}/></button>
       </div>
     </div>
@@ -95,7 +91,7 @@ export default function Section({params}:{params:{section:string}}){
     {loading?<div className="panel loading-panel">Loading verified module data…</div>:null}
     {!loading&&(section==='seo'||section==='keywords')&&<SEOView data={data||{}} range={range} onRange={setRange} onRefresh={()=>setRefreshKey(v=>v+1)}/>}
     {!loading&&section==='audit'&&<AuditView data={data||{}}/>}
-    {!loading&&(section==='automation'||section==='speed')&&<AutomationView data={data||{}} speed={section==='speed'}/>}
+    {!loading&&section==='automation'&&<AutomationView data={data||{}} speed={false}/>
     {!loading&&section==='agents'&&<AgentsView data={data||{}}/>}
     {!loading&&section==='settings'&&<SettingsView data={data||{}}/>}
     {!loading&&section==='competitors'&&<CompetitorsView data={data||{}} onRefresh={()=>setRefreshKey(v=>v+1)}/>}
