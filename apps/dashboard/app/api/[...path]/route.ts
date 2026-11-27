@@ -7,12 +7,16 @@ async function proxy(request:Request,context:{params:Promise<{path:string[]}>}){
  const target=API+'/api/'+path.map(encodeURIComponent).join('/')+new URL(request.url).search;
  const headers=new Headers();
  for(const key of ['accept','content-type','cookie','authorization']){const value=request.headers.get(key);if(value)headers.set(key,value);}
- let upstream:Response;
- try{
-  upstream=await fetch(target,{method:request.method,headers,body:['GET','HEAD'].includes(request.method)?undefined:await request.arrayBuffer(),cache:'no-store',redirect:'manual',signal:AbortSignal.timeout(25000)});
- }catch(error){
-  return Response.json({error:'Backend is temporarily unavailable. Your sign-in session has not been cleared. Please retry in a moment.'},{status:502,headers:{'Cache-Control':'no-store'}});
+ let upstream:Response|undefined;
+ const bodyBuffer=['GET','HEAD'].includes(request.method)?undefined:await request.arrayBuffer();
+ for(let attempt=0;attempt<2;attempt++){
+  try{
+   upstream=await fetch(target,{method:request.method,headers,body:bodyBuffer,cache:'no-store',redirect:'manual',signal:AbortSignal.timeout(25000)});
+   if(upstream.status!==502&&upstream.status!==503&&upstream.status!==504) break;
+  }catch{}
+  if(attempt<1) await new Promise(resolve=>setTimeout(resolve,1200));
  }
+ if(!upstream)return Response.json({error:'Backend is temporarily unavailable. Your sign-in session has not been cleared. Please retry in a moment.'},{status:502,headers:{'Cache-Control':'no-store'}});
  const responseHeaders=new Headers();
  for(const key of ['content-type','cache-control','location','www-authenticate']){const value=upstream.headers.get(key);if(value)responseHeaders.set(key,value);}
  const cookies=(upstream.headers as any).getSetCookie?.()||[];
