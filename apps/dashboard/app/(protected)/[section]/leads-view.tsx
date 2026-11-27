@@ -14,7 +14,7 @@ export default function LeadsView({ data }: { data: { items?: Lead[]; total?: nu
   const [current, setCurrent] = useState(data);
   const [loading, setLoading] = useState(false);
   useEffect(() => {
-    if (page === (data.page || 1)) return;
+    if (page === (current.page || data.page || 1)) return;
     let active = true;
     setLoading(true);
     fetch('/api/leads?page=' + page + '&limit=25', { credentials: 'include' })
@@ -26,7 +26,7 @@ export default function LeadsView({ data }: { data: { items?: Lead[]; total?: nu
       .catch(() => { if (active) setPage(current.page || 1); })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, [page, data.page]);
+  }, [page, current.page, data.page]);
   const items = current.items || [];
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
