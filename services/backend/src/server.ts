@@ -19,7 +19,7 @@ app.post('/api/leads',async(req:any,reply)=>{
  const service=String(body?.project_type||body?.service||'').trim();
  const message=String(body?.description||body?.message||'').trim();
  if(!name||!email||!service||!message)return reply.code(400).send({error:'Please fill in name, email, project type and project description.'});
- const lead=await Lead.create({name,email,phone:String(body?.phone||'').trim()||undefined,service,message,sourcePage:String(body?.sourcePage||'website-contact').trim(),status:'new'});
+ const lead=await Lead.create({name,email,phone:String(body?.phone||'').trim()||undefined,company:String(body?.company||'').trim()||undefined,budget:String(body?.budget||'').trim()||undefined,service,message,sourcePage:String(body?.sourcePage||'website-contact').trim(),status:'new'});
  await Notification.create({type:'lead_received',title:'New project enquiry',message:name+' · '+service,metadata:{leadId:lead._id,email,service}});
  return reply.code(201).send({ok:true,id:lead._id});
 });
@@ -38,7 +38,7 @@ app.post('/api/competitors/:id/check',{preHandler:(app as any).auth},async(req:a
  try{const result=await crawl(String(item.url||''));item.title=result.title;item.description=result.description;item.status=result.status>=200&&result.status<400?'reachable':'issue';item.lastCheckedAt=new Date();item.lastError=undefined;await item.save();return item;}catch(error:any){item.status='error';item.lastCheckedAt=new Date();item.lastError=String(error?.message||error);await item.save();return reply.code(502).send({error:'Competitor check failed.'});}
 });
 
-app.get('/api/leads',{preHandler:(app as any).auth},async(req:any)=>{const page=Math.max(1,Number(req.query?.page||1));const limit=Math.min(100,Math.max(1,Number(req.query?.limit||25)));return {items:await Lead.find().sort({createdAt:-1}).skip((page-1)*limit).limit(limit).lean(),page,limit}});
+app.get('/api/leads',{preHandler:(app as any).auth},async(req:any)=>{const page=Math.max(1,Number(req.query?.page||1));const limit=Math.min(100,Math.max(1,Number(req.query?.limit||25)));const [items,total]=await Promise.all([Lead.find().sort({createdAt:-1}).skip((page-1)*limit).limit(limit).lean(),Lead.countDocuments()]);return {items,total,page,limit,pages:Math.ceil(total/limit)}});
 app.get('/api/notifications',{preHandler:(app as any).auth},async()=>Notification.find().sort({createdAt:-1}).limit(100).lean());
 
 app.get('/api/search-console/summary',{preHandler:(app as any).auth},async(req:any,reply)=>{
