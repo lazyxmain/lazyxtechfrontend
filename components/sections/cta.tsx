@@ -1,5 +1,3 @@
-'use client';
-
 import { ArrowUpRight, Phone } from 'lucide-react';
 import { COMPANY } from '@/lib/site';
 import { Magnetic } from '@/components/magnetic';
