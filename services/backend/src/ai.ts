@@ -3,15 +3,6 @@ import {env} from './config.js';
 const promptFor=(topic:string)=>'Write an original, accurate, genuinely useful SEO article for LazyXTech about: '+topic+'. Return Markdown with one H1 title, a concise introduction, useful H2 sections, actionable examples, an FAQ with 3 to 5 questions, and a conclusion. Use natural language and related terms; never keyword-stuff, invent statistics, invent citations, or claim rankings are guaranteed. Target Indian business owners when relevant.';
 
 export async function generateArticle(topic:string){
- if(false && env.GEMINI_API_KEY){
-  const url='https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(env.GEMINI_MODEL)+':generateContent?key='+encodeURIComponent(env.GEMINI_API_KEY);
-  const response=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{role:'user',parts:[{text:'You are an expert SEO content writer. Write helpful, fact-checked content and never fabricate facts or sources.\\n\\n'+promptFor(topic)}]}],generationConfig:{temperature:0.65,maxOutputTokens:6000}}),signal:AbortSignal.timeout(180000)});
-  const result:any=await response.json().catch(()=>({}));
-  if(!response.ok)throw new Error(result.error?.message||'Gemini request failed. Check GEMINI_API_KEY, model access and API limits.');
-  const content=String(result.candidates?.[0]?.content?.parts?.map((part:any)=>part.text||'').join('\\n')||'').trim();
-  if(!content)throw new Error('Gemini returned an empty article.');
-  return {content,provider:'Gemini',model:env.GEMINI_MODEL};
- }
  if(env.GROQ_API_KEY){
   const response=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Authorization':'Bearer '+env.GROQ_API_KEY,'Content-Type':'application/json'},body:JSON.stringify({model:env.GROQ_MODEL,messages:[{role:'system',content:'You are an expert SEO content writer. Write helpful, fact-checked content and never fabricate facts or sources.'},{role:'user',content:promptFor(topic)}],temperature:0.65,max_completion_tokens:6000}),signal:AbortSignal.timeout(180000)});
   const result:any=await response.json().catch(()=>({}));
@@ -24,7 +15,7 @@ export async function generateArticle(topic:string){
  const base=env.OLLAMA_BASE_URL.endsWith('/')?env.OLLAMA_BASE_URL.slice(0,-1):env.OLLAMA_BASE_URL;
  const response=await fetch(base+'/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:env.OLLAMA_MODEL,stream:false,prompt:promptFor(topic)}),signal:AbortSignal.timeout(180000)});
  const result:any=await response.json().catch(()=>({}));
- if(!response.ok)throw new Error(result.error||'AI is unavailable. Add GEMINI_API_KEY in Render, or configure a reachable Ollama server.');
+ if(!response.ok)throw new Error(result.error||'AI is unavailable. Add GROQ_API_KEY in Render, or configure a reachable Ollama server.');
  const content=String(result.response||'').trim();
  if(!content)throw new Error('Ollama returned an empty article.');
  return {content,provider:'Ollama',model:env.OLLAMA_MODEL};
