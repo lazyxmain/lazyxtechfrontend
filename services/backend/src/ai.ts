@@ -8,7 +8,7 @@ export async function generateArticle(topic:string){
   const result:any=await response.json().catch(()=>({}));
   if(!response.ok)throw new Error(result.error?.message||'Groq request failed. Check GROQ_API_KEY, model access and free-tier limits.');
   const raw=result.choices?.[0]?.message?.content;
-  const content=(typeof raw==='string'?raw:Array.isArray(raw)?raw.map((part:any)=>part.text||'').join('\\n'):'').trim();
+  const content=(typeof raw==='string'?raw:Array.isArray(raw)?raw.map((part:any)=>part.text||'').join('\n'):'').trim();
   if(!content)throw new Error('Groq returned an empty article.');
   return {content,provider:'Groq',model:env.GROQ_MODEL};
  }
