@@ -3,8 +3,8 @@ import Link from 'next/link';
 import {usePathname,useRouter} from 'next/navigation';
 import {BarChart3,Search,ShieldCheck,FileText,Settings,Bot,Users,Bell,Gauge,Sun,Moon,LogOut,Menu,X,Activity,Zap,Clock3,Wifi,WifiOff} from 'lucide-react';
 import {useState,useEffect} from 'react';
-const nav=[['Overview','/'],['SEO Analytics','/seo'],['Keywords','/keywords'],['Technical Audit','/audit'],['Page Speed','/speed'],['Competitors','/competitors'],['AI Content','/content'],['Blog Manager','/blog'],['Leads','/leads'],['Notifications','/notifications'],['AI Agents','/agents'],['Automation','/automation'],['Reports','/reports'],['Settings','/settings']];
-const icons=[BarChart3,Search,Search,ShieldCheck,Gauge,Users,FileText,FileText,Users,Bell,Bot,Zap,BarChart3,Settings];
+const nav=[['Overview','/'],['SEO Analytics','/seo'],['Keywords','/keywords'],['Technical Audit','/audit'],['Competitors','/competitors'],['AI Content','/content'],['Blog Manager','/blog'],['Leads','/leads'],['Notifications','/notifications'],['AI Agents','/agents'],['Automation','/automation'],['Reports','/reports'],['Settings','/settings']];
+const icons=[BarChart3,Search,Search,ShieldCheck,Users,FileText,FileText,Users,Bell,Bot,Zap,BarChart3,Settings];
 export default function DashboardShell({children}:{children:React.ReactNode}){
  const path=usePathname();const router=useRouter();const [dark,setDark]=useState(false);const [open,setOpen]=useState(false);
  const [clock,setClock]=useState('');const [worker,setWorker]=useState<any>(null);const [ai,setAi]=useState<any>(null);const [signingOut,setSigningOut]=useState(false);
